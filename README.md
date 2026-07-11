@@ -12,7 +12,7 @@
 
 A private, browser-based developer workspace built with React, strict TypeScript, Vite, and Tailwind CSS.
 
-**All processing happens locally in your browser. Editor content is never uploaded to a server.**
+**All editor processing happens locally in your browser. Editor content is never intentionally included in analytics.**
 
 [Features](#features) · [Quick start](#getting-started) · [Project structure](#project-structure) · [Development](#development-workflow)
 
@@ -27,7 +27,7 @@ A private, browser-based developer workspace built with React, strict TypeScript
 | **SQL Converter** | Parse DDL from four SQL dialects | EF Core entities, C# models, TypeScript DTOs, Dart models |
 
 > [!NOTE]
-> The app is intentionally client-only. JSON, HTML, SQL, generated code, and console output remain on the local device.
+> The app is intentionally client-only. JSON, HTML, SQL, generated code, and console output remain on the local device. Standard page-view analytics are collected through Vercel Web Analytics without custom editor-content events.
 
 ## Features
 
@@ -125,6 +125,7 @@ Select the source database dialect before converting:
 - Tailwind CSS 3
 - Ajv 8
 - Lucide React icons
+- Vercel Web Analytics
 
 ## Getting started
 
