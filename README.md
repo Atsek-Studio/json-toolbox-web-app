@@ -64,13 +64,19 @@ The dedicated **HTML Viewer** tab provides a code editor and a live browser prev
 
 - Paste or write a complete HTML document or fragment.
 - See HTML and CSS changes render immediately.
+- Debounce live updates while typing to avoid reloading on every keystroke.
+- Switch between Live and Manual preview modes.
+- Refresh the iframe explicitly to rerun the current document and its scripts.
 - Run embedded JavaScript inside an isolated iframe sandbox.
+- Inspect `console.log`, `console.info`, `console.warn`, and `console.error` output.
+- Inspect uncaught runtime errors and unhandled promise rejections.
+- Clear captured console output independently from the HTML editor.
 - Load externally referenced styles, images, and scripts when allowed by their servers.
 - Keep preview code isolated from the JSON Toolbox page and its origin.
 
 ### Convert SQL tables
 
-The dedicated **SQL Converter** tab parses a SQL Server-style `CREATE TABLE` statement into a shared table model and generates:
+The dedicated **SQL Converter** tab parses a `CREATE TABLE` statement into a shared table model and generates:
 
 - **C# EF Core entity** classes with `[Table]`, `[Key]`, `[Required]`, `[MaxLength]`, `[Column]`, and identity-generation attributes.
 - **C# models** as clean POCO classes without Entity Framework mapping attributes.
@@ -78,6 +84,13 @@ The dedicated **SQL Converter** tab parses a SQL Server-style `CREATE TABLE` sta
 - **Dart models** with constructors plus `fromJson` and `toJson` methods.
 
 The parser recognizes schema-qualified and quoted table names, common SQL types, nullability, inline or table-level primary keys, identity columns, unique columns, defaults, lengths, and decimal precision.
+
+Select the source database dialect before converting:
+
+- **SQL Server:** brackets, `IDENTITY`, `DATETIME2`, `UNIQUEIDENTIFIER`, `ROWVERSION`, and SQL Server date/binary behavior.
+- **PostgreSQL:** quoted identifiers, `SERIAL` types, `GENERATED AS IDENTITY`, `TIMESTAMPTZ`, `BYTEA`, `UUID`, `JSONB`, and character-varying types.
+- **MySQL:** backtick identifiers, `AUTO_INCREMENT`, unsigned numeric types, `TINYINT(1)` booleans, and MySQL date types.
+- **Oracle:** quoted identifiers, `NUMBER`, `VARCHAR2`, `NVARCHAR2`, `CLOB`, `BLOB`, `DATE`, timestamp-with-time-zone types, and Oracle identity columns.
 
 ## Technology
 
@@ -120,6 +133,20 @@ npm run preview
 | `npm run typecheck` | Run strict TypeScript checks without emitting files. |
 | `npm run build` | Generate an optimized production build in `dist/`. |
 | `npm run preview` | Serve the production build locally for verification. |
+
+## Development workflow
+
+Repository-specific coding and verification rules are documented in [`AGENTS.md`](AGENTS.md).
+
+Every pull request and push to `main` runs the GitHub Actions workflow in [`.github/workflows/ci.yml`](.github/workflows/ci.yml). CI installs dependencies from `package-lock.json`, runs strict TypeScript checks, and creates the production build on Node.js 20.
+
+Before opening a pull request, run:
+
+```bash
+npm run typecheck
+npm run build
+git diff --check
+```
 
 ## How to use
 
@@ -221,7 +248,7 @@ Place shared visual components in `src/components/` and keep domain processing i
 - JSON Schema support follows the Ajv configuration used in `src/utils/jsonTools.ts`.
 - HTML previews run in a sandboxed iframe with scripts enabled but without same-origin access.
 - External preview resources still depend on network availability and their server security policies.
-- SQL conversion currently accepts one `CREATE TABLE` statement and targets common SQL Server syntax.
+- SQL conversion currently accepts one `CREATE TABLE` statement and supports a practical subset of SQL Server, PostgreSQL, MySQL, and Oracle DDL.
 - Foreign keys, indexes, computed columns, and database relationships are not generated yet.
 - Generated EF Core entities are a starting point; application-specific navigation properties and validation rules may still be required.
 

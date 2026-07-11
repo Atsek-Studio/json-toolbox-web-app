@@ -32,7 +32,7 @@ export default function JsonToolboxPage() {
       {workspace === "html" ? (
         <HtmlPreview value={toolbox.htmlInput} onChange={toolbox.setHtmlInput} onClear={toolbox.handleClearHtml} />
       ) : workspace === "sql" ? (
-        <SqlConverter input={sql.input} onInputChange={sql.setInput} target={sql.target} onTargetChange={sql.setTarget} output={sql.output} error={sql.error} copied={sql.copied} onConvert={sql.convert} onCopy={sql.copy} onClear={sql.clear} />
+        <SqlConverter input={sql.input} onInputChange={sql.setInput} dialect={sql.dialect} onDialectChange={sql.setDialect} target={sql.target} onTargetChange={sql.setTarget} output={sql.output} error={sql.error} copied={sql.copied} onConvert={sql.convert} onCopy={sql.copy} onClear={sql.clear} />
       ) : <><Toolbar
         onAction={toolbox.handleAction}
         activeAction={toolbox.lastAction}

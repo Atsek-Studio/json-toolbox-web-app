@@ -5,6 +5,7 @@ export type ToolboxAction = "beautify" | "minify" | "stringify" | "convert" | "d
 export type TransformAction = Exclude<ToolboxAction, "diff" | "schema">;
 export type WorkspaceTab = "json" | "html" | "sql";
 export type SqlConvertTarget = "csharp-entity" | "csharp-model" | "typescript-dto" | "dart";
+export type SqlDialect = "sqlserver" | "postgresql" | "mysql" | "oracle";
 
 export interface SqlColumn {
   name: string;
@@ -23,6 +24,7 @@ export interface SqlColumn {
 export interface SqlTable {
   name: string;
   schema?: string;
+  dialect: SqlDialect;
   columns: SqlColumn[];
 }
 export type ConvertTarget = "dart" | "typescript" | "csharp";

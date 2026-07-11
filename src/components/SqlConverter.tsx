@@ -1,6 +1,6 @@
 import React from "react";
 import { Check, Copy, Database, Play, Trash2 } from "lucide-react";
-import type { SqlConvertTarget, ToolboxError } from "../types";
+import type { SqlConvertTarget, SqlDialect, ToolboxError } from "../types";
 import CodeOutput from "./CodeOutput";
 import ErrorPanel from "./ErrorPanel";
 import PanelHeader from "./PanelHeader";
@@ -8,6 +8,8 @@ import PanelHeader from "./PanelHeader";
 interface SqlConverterProps {
   input: string;
   onInputChange: (value: string) => void;
+  dialect: SqlDialect;
+  onDialectChange: (dialect: SqlDialect) => void;
   target: SqlConvertTarget;
   onTargetChange: (target: SqlConvertTarget) => void;
   output: string;
@@ -25,10 +27,20 @@ const targets: { key: SqlConvertTarget; label: string }[] = [
   { key: "dart", label: "Dart Model" },
 ];
 
-export default function SqlConverter({ input, onInputChange, target, onTargetChange, output, error, copied, onConvert, onCopy, onClear }: SqlConverterProps) {
+export default function SqlConverter({ input, onInputChange, dialect, onDialectChange, target, onTargetChange, output, error, copied, onConvert, onCopy, onClear }: SqlConverterProps) {
   return (
     <>
       <div className="flex flex-wrap items-center gap-2 border-b border-neutral-800 bg-neutral-900/30 px-5 py-3">
+        <label className="inline-flex items-center gap-2 text-xs text-neutral-500">
+          Dialect
+          <select value={dialect} onChange={(event) => onDialectChange(event.target.value as SqlDialect)} className="h-7 rounded border border-neutral-700 bg-neutral-950 px-2 text-xs text-neutral-100 outline-none focus:border-teal-500/70">
+            <option value="sqlserver">SQL Server</option>
+            <option value="postgresql">PostgreSQL</option>
+            <option value="mysql">MySQL</option>
+            <option value="oracle">Oracle</option>
+          </select>
+        </label>
+        <div className="mx-1 h-5 w-px bg-neutral-800" />
         <span className="mr-1 inline-flex items-center gap-1.5 text-xs text-neutral-500"><Database className="h-3.5 w-3.5" />Output</span>
         {targets.map((option) => (
           <button key={option.key} onClick={() => onTargetChange(option.key)} className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${target === option.key ? "border-teal-500 bg-teal-600 text-white" : "border-neutral-700 bg-neutral-800 text-neutral-300 hover:bg-neutral-700"}`}>{option.label}</button>

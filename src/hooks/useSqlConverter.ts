@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import type { SqlConvertTarget, ToolboxError } from "../types";
+import type { SqlConvertTarget, SqlDialect, ToolboxError } from "../types";
 import { generateFromSql } from "../utils/sqlGenerators";
 import { parseCreateTable } from "../utils/sqlParser";
 
@@ -15,6 +15,7 @@ const SAMPLE_SQL = `CREATE TABLE [dbo].[Users] (
 export function useSqlConverter() {
   const [input, setInput] = useState(SAMPLE_SQL);
   const [target, setTarget] = useState<SqlConvertTarget>("csharp-entity");
+  const [dialect, setDialect] = useState<SqlDialect>("sqlserver");
   const [output, setOutput] = useState("");
   const [error, setError] = useState<ToolboxError | null>(null);
   const [copied, setCopied] = useState(false);
@@ -29,13 +30,19 @@ export function useSqlConverter() {
   const generate = useCallback((selectedTarget: SqlConvertTarget) => {
     setCopied(false);
     try {
-      setOutput(generateFromSql(parseCreateTable(input), selectedTarget));
+      setOutput(generateFromSql(parseCreateTable(input, dialect), selectedTarget));
       setError(null);
     } catch (caught) {
       setOutput("");
       setError({ message: caught instanceof Error ? caught.message : String(caught) });
     }
-  }, [input]);
+  }, [dialect, input]);
+
+  const changeDialect = useCallback((nextDialect: SqlDialect) => {
+    setDialect(nextDialect);
+    setOutput("");
+    setError(null);
+  }, []);
 
   const convert = useCallback(() => generate(target), [generate, target]);
 
@@ -61,5 +68,5 @@ export function useSqlConverter() {
     setError(null);
   }, []);
 
-  return { input, inputBytes, setInput: updateInput, target, setTarget: changeTarget, output, error, copied, convert, copy, clear };
+  return { input, inputBytes, setInput: updateInput, dialect, setDialect: changeDialect, target, setTarget: changeTarget, output, error, copied, convert, copy, clear };
 }
