@@ -10,15 +10,18 @@ import HtmlPreview from "../components/HtmlPreview";
 import WorkspaceTabs from "../components/WorkspaceTabs";
 import type { WorkspaceTab } from "../types";
 import { useJsonToolbox } from "../hooks/useJsonToolbox";
+import { useSqlConverter } from "../hooks/useSqlConverter";
+import SqlConverter from "../components/SqlConverter";
 
 export default function JsonToolboxPage() {
   const toolbox = useJsonToolbox();
+  const sql = useSqlConverter();
   const [workspace, setWorkspace] = useState<WorkspaceTab>("json");
 
   return (
     <section className="w-full bg-neutral-950 text-neutral-200 rounded-xl border border-neutral-800 overflow-hidden font-sans">
       <Header
-        inputBytes={workspace === "html" ? toolbox.htmlBytes : toolbox.inputBytes}
+        inputBytes={workspace === "html" ? toolbox.htmlBytes : workspace === "sql" ? sql.inputBytes : toolbox.inputBytes}
         outputBytes={toolbox.outputBytes}
         lastAction={toolbox.lastAction}
         hasError={Boolean(toolbox.error)}
@@ -28,6 +31,8 @@ export default function JsonToolboxPage() {
       <WorkspaceTabs activeTab={workspace} onChange={setWorkspace} />
       {workspace === "html" ? (
         <HtmlPreview value={toolbox.htmlInput} onChange={toolbox.setHtmlInput} onClear={toolbox.handleClearHtml} />
+      ) : workspace === "sql" ? (
+        <SqlConverter input={sql.input} onInputChange={sql.setInput} target={sql.target} onTargetChange={sql.setTarget} output={sql.output} error={sql.error} copied={sql.copied} onConvert={sql.convert} onCopy={sql.copy} onClear={sql.clear} />
       ) : <><Toolbar
         onAction={toolbox.handleAction}
         activeAction={toolbox.lastAction}

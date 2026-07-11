@@ -1,6 +1,6 @@
 # JSON Toolbox
 
-JSON Toolbox is a browser-based collection of utilities for formatting, exploring, comparing, validating, and converting JSON. It is built with React, strict TypeScript, Vite, and Tailwind CSS.
+JSON Toolbox is a browser-based developer utility for working with JSON, previewing HTML, and converting SQL table definitions into application models. It is built with React, strict TypeScript, Vite, and Tailwind CSS.
 
 All JSON processing happens locally in the browser. The application does not upload editor content to a server.
 
@@ -20,7 +20,7 @@ All JSON processing happens locally in the browser. The application does not upl
 Generate typed structures from representative JSON data:
 
 - Dart model classes with `fromJson` and `toJson` methods
-- JavaScript DTO classes with JSDoc property definitions
+- TypeScript DTO interfaces with typed arrays, nested interfaces, and nullable properties
 - C# entity classes
 
 The root class name can be changed before generating code. Nested objects and arrays of objects generate additional classes.
@@ -67,6 +67,17 @@ The dedicated **HTML Viewer** tab provides a code editor and a live browser prev
 - Run embedded JavaScript inside an isolated iframe sandbox.
 - Load externally referenced styles, images, and scripts when allowed by their servers.
 - Keep preview code isolated from the JSON Toolbox page and its origin.
+
+### Convert SQL tables
+
+The dedicated **SQL Converter** tab parses a SQL Server-style `CREATE TABLE` statement into a shared table model and generates:
+
+- **C# EF Core entity** classes with `[Table]`, `[Key]`, `[Required]`, `[MaxLength]`, `[Column]`, and identity-generation attributes.
+- **C# models** as clean POCO classes without Entity Framework mapping attributes.
+- **TypeScript DTOs** as exported interfaces, with nullable SQL columns represented as optional `| null` properties.
+- **Dart models** with constructors plus `fromJson` and `toJson` methods.
+
+The parser recognizes schema-qualified and quoted table names, common SQL types, nullability, inline or table-level primary keys, identity columns, unique columns, defaults, lengths, and decimal precision.
 
 ## Technology
 
@@ -118,6 +129,7 @@ npm run preview
 4. Select **Diff**, paste the original and modified documents, and press **Compare JSON**.
 5. Select **Schema**, paste JSON data and a schema, and press **Validate JSON**.
 6. Switch to the **HTML Viewer** tab and paste markup to render it in the live preview.
+7. Switch to the **SQL Converter** tab, paste one `CREATE TABLE` statement, choose an output, and press **Convert SQL**.
 
 Invalid JSON is shown inline with the native parser message and, when available, its line and column.
 
@@ -139,7 +151,8 @@ Invalid JSON is shown inline with the native parser message and, when available,
     |-- pages/
     |   `-- JsonToolboxPage.tsx   # Main mode and panel layout
     |-- hooks/
-    |   `-- useJsonToolbox.ts     # Application state and action handlers
+    |   |-- useJsonToolbox.ts     # JSON and HTML state and action handlers
+    |   `-- useSqlConverter.ts    # SQL converter state and generation workflow
     |-- components/
     |   |-- AppShell.tsx          # Responsive application frame
     |   |-- Header.tsx            # Title and byte/change statistics
@@ -155,6 +168,7 @@ Invalid JSON is shown inline with the native parser message and, when available,
     |   |-- DiffResult.tsx        # Split diff renderer
     |   |-- SchemaResult.tsx      # Schema validation result list
     |   |-- HtmlPreview.tsx       # Sandboxed HTML editor and live preview
+    |   |-- SqlConverter.tsx      # SQL input and generated model workspace
     |   |-- ErrorPanel.tsx        # Shared parsing and processing error display
     |   |-- PanelHeader.tsx       # Shared panel title bar
     |   `-- IconButton.tsx        # Shared icon-only button
@@ -162,6 +176,8 @@ Invalid JSON is shown inline with the native parser message and, when available,
         |-- jsonTools.ts          # Formatting, diffing, validation, and tree helpers
         |-- codeGenerators.ts     # Dart, JavaScript, and C# generators
         |-- splitDiff.ts          # Line diff and split-row alignment algorithm
+        |-- sqlParser.ts          # CREATE TABLE parser and table model builder
+        |-- sqlGenerators.ts      # EF Core, C#, TypeScript DTO, and Dart generators
         `-- sampleJson.ts         # Initial editor example
 ```
 
@@ -205,6 +221,9 @@ Place shared visual components in `src/components/` and keep domain processing i
 - JSON Schema support follows the Ajv configuration used in `src/utils/jsonTools.ts`.
 - HTML previews run in a sandboxed iframe with scripts enabled but without same-origin access.
 - External preview resources still depend on network availability and their server security policies.
+- SQL conversion currently accepts one `CREATE TABLE` statement and targets common SQL Server syntax.
+- Foreign keys, indexes, computed columns, and database relationships are not generated yet.
+- Generated EF Core entities are a starting point; application-specific navigation properties and validation rules may still be required.
 
 ## License
 

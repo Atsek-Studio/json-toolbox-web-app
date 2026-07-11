@@ -72,9 +72,14 @@ function dartType(value: JsonValue | undefined, key: string): string {
   return "String";
 }
 
-function jsType(value: JsonValue | undefined, key: string): string {
-  if (value === null || value === undefined) return "any";
-  if (Array.isArray(value)) return `${jsType(mergeValues(value), singularize(key))}[]`;
+function typescriptType(value: JsonValue | undefined, key: string): string {
+  if (value === null || value === undefined) return "string | null";
+  if (Array.isArray(value)) {
+    const itemType = typescriptType(mergeValues(value), singularize(key));
+    const includesNull = value.includes(null) && !itemType.includes("null");
+    const combinedType = includesNull ? `${itemType} | null` : itemType;
+    return combinedType.includes("|") ? `(${combinedType})[]` : `${combinedType}[]`;
+  }
   if (typeof value === "object") return toPascalCase(key);
   if (typeof value === "number") return "number";
   if (typeof value === "boolean") return "boolean";
@@ -127,13 +132,15 @@ function generateDart(value: JsonValue, rootName: string): string {
     .join("\n\n");
 }
 
-function generateJsDto(value: JsonValue, rootName: string): string {
+function generateTypescriptDto(value: JsonValue, rootName: string): string {
   const classes = collectClasses(value, rootName);
   return [...classes.entries()]
     .map(([className, fields]) => {
-      const typedef = fields.map((field) => ` * @property {${jsType(field.sample, field.key)}} ${toCamelCase(field.key)}`);
-      const assignments = fields.map((field) => `    this.${toCamelCase(field.key)} = data.${field.key};`);
-      return `/**\n${typedef.join("\n")}\n */\nexport class ${className}Dto {\n  constructor(data = {}) {\n${assignments.join("\n")}\n  }\n}`;
+      const properties = fields.map((field) => {
+        const optional = field.sample === null ? "?" : "";
+        return `  ${toCamelCase(field.key)}${optional}: ${typescriptType(field.sample, field.key)};`;
+      });
+      return `export interface ${className} {\n${properties.join("\n")}\n}`;
     })
     .join("\n\n");
 }
@@ -153,7 +160,7 @@ export function convertJsonToCode(input: string, target: ConvertTarget, rootName
   const className = toPascalCase(rootName);
 
   if (target === "dart") return generateDart(parsed, className);
-  if (target === "js") return generateJsDto(parsed, className);
+  if (target === "typescript") return generateTypescriptDto(parsed, className);
   if (target === "csharp") return generateCSharpEntity(parsed, className);
 
   throw new Error("Unknown convert target");

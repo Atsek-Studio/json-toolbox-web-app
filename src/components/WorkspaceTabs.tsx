@@ -1,5 +1,5 @@
 import React from "react";
-import { Braces, FileCode2 } from "lucide-react";
+import { Braces, Database, FileCode2 } from "lucide-react";
 import type { WorkspaceTab } from "../types";
 
 interface WorkspaceTabsProps {
@@ -10,6 +10,7 @@ interface WorkspaceTabsProps {
 const tabs = [
   { key: "json" as const, label: "JSON Toolbox", Icon: Braces },
   { key: "html" as const, label: "HTML Viewer", Icon: FileCode2 },
+  { key: "sql" as const, label: "SQL Converter", Icon: Database },
 ];
 
 export default function WorkspaceTabs({ activeTab, onChange }: WorkspaceTabsProps) {

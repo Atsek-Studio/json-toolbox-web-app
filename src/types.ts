@@ -3,8 +3,29 @@ export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue
 
 export type ToolboxAction = "beautify" | "minify" | "stringify" | "convert" | "diff" | "schema";
 export type TransformAction = Exclude<ToolboxAction, "diff" | "schema">;
-export type WorkspaceTab = "json" | "html";
-export type ConvertTarget = "dart" | "js" | "csharp";
+export type WorkspaceTab = "json" | "html" | "sql";
+export type SqlConvertTarget = "csharp-entity" | "csharp-model" | "typescript-dto" | "dart";
+
+export interface SqlColumn {
+  name: string;
+  sqlType: string;
+  baseType: string;
+  length?: number;
+  precision?: number;
+  scale?: number;
+  nullable: boolean;
+  primaryKey: boolean;
+  unique: boolean;
+  identity: boolean;
+  defaultValue?: string;
+}
+
+export interface SqlTable {
+  name: string;
+  schema?: string;
+  columns: SqlColumn[];
+}
+export type ConvertTarget = "dart" | "typescript" | "csharp";
 export type ToolboxView = "text" | "tree";
 
 export interface ErrorLocation {

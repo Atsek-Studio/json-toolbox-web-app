@@ -86,7 +86,7 @@ export default function Toolbar({
               className="h-7 rounded border border-neutral-700 bg-neutral-950 px-2 text-xs text-neutral-100 outline-none focus:border-teal-500/70"
             >
               <option value="dart">Dart model</option>
-              <option value="js">JS DTO</option>
+              <option value="typescript">TypeScript DTO</option>
               <option value="csharp">C# entity</option>
             </select>
           </div>
