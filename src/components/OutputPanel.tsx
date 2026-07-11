@@ -1,10 +1,22 @@
 import React from "react";
 import { ArrowLeftRight, Check, Copy } from "lucide-react";
-import CodeOutput from "./CodeOutput.jsx";
-import ErrorPanel from "./ErrorPanel.jsx";
-import IconButton from "./IconButton.jsx";
-import JsonHighlight from "./JsonHighlight.jsx";
-import PanelHeader from "./PanelHeader.jsx";
+import CodeOutput from "./CodeOutput";
+import ErrorPanel from "./ErrorPanel";
+import IconButton from "./IconButton";
+import JsonHighlight from "./JsonHighlight";
+import PanelHeader from "./PanelHeader";
+import type { ToolboxError } from "../types";
+
+interface OutputPanelProps {
+  output: string;
+  error: ToolboxError | null;
+  isValid: boolean;
+  reduction: number | null;
+  copied: boolean;
+  outputType?: "json" | "code";
+  onCopy: () => void | Promise<void>;
+  onSwap: () => void;
+}
 
 export default function OutputPanel({
   output,
@@ -15,7 +27,7 @@ export default function OutputPanel({
   outputType = "json",
   onCopy,
   onSwap,
-}) {
+}: OutputPanelProps) {
   const meta = (
     <>
       {isValid && (

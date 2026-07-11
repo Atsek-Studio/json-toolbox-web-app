@@ -1,6 +1,7 @@
 import React from "react";
 import { ChevronRight, ChevronDown } from "lucide-react";
-import { jsonType } from "../utils/jsonTools.js";
+import { jsonType } from "../utils/jsonTools";
+import type { JsonPrimitive, JsonValue } from "../types";
 
 const VALUE_COLORS = {
   string: "text-emerald-400",
@@ -18,11 +19,11 @@ const BRACKET_COLORS = [
   "text-pink-400",
 ];
 
-function bracketClassName(depth) {
+function bracketClassName(depth: number): string {
   return `${BRACKET_COLORS[depth % BRACKET_COLORS.length]} font-semibold`;
 }
 
-function ValueLabel({ value }) {
+function ValueLabel({ value }: { value: JsonPrimitive }) {
   const type = jsonType(value);
   if (type === "string") return <span className={VALUE_COLORS.string}>"{value}"</span>;
   if (type === "null") return <span className={VALUE_COLORS.null}>null</span>;
@@ -30,7 +31,16 @@ function ValueLabel({ value }) {
   return <span className={VALUE_COLORS.number}>{value}</span>;
 }
 
-export default function TreeNode({ label, value, path, depth, collapsedPaths, onToggle }) {
+interface TreeNodeProps {
+  label: string | null;
+  value: JsonValue;
+  path: string;
+  depth: number;
+  collapsedPaths: Set<string>;
+  onToggle: (path: string) => void;
+}
+
+export default function TreeNode({ label, value, path, depth, collapsedPaths, onToggle }: TreeNodeProps) {
   const type = jsonType(value);
   const isContainer = type === "object" || type === "array";
   const isCollapsed = collapsedPaths.has(path);
@@ -39,12 +49,14 @@ export default function TreeNode({ label, value, path, depth, collapsedPaths, on
     return (
       <div className="flex items-baseline gap-1.5 py-0.5" style={{ paddingLeft: depth * 16 + 20 }}>
         {label !== null && <span className="text-neutral-400">{label}:</span>}
-        <ValueLabel value={value} />
+        <ValueLabel value={value as JsonPrimitive} />
       </div>
     );
   }
 
-  const entries = type === "array" ? value.map((v, i) => [i, v]) : Object.entries(value);
+  const entries: [string, JsonValue][] = type === "array"
+    ? (value as JsonValue[]).map((item, index) => [String(index), item])
+    : Object.entries(value as Record<string, JsonValue>);
   const count = entries.length;
   const bracket = type === "array" ? ["[", "]"] : ["{", "}"];
 

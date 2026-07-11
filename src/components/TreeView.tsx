@@ -1,27 +1,34 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Maximize2, Minimize } from "lucide-react";
-import ErrorPanel from "./ErrorPanel.jsx";
-import IconButton from "./IconButton.jsx";
-import PanelHeader from "./PanelHeader.jsx";
-import TreeNode from "./TreeNode.jsx";
-import { collectContainerPaths, jsonType, locateError } from "../utils/jsonTools.js";
+import ErrorPanel from "./ErrorPanel";
+import IconButton from "./IconButton";
+import PanelHeader from "./PanelHeader";
+import TreeNode from "./TreeNode";
+import { collectContainerPaths, jsonType, locateError } from "../utils/jsonTools";
+import type { JsonValue, ToolboxError } from "../types";
 
-export default function TreeView({ input }) {
-  const [collapsedPaths, setCollapsedPaths] = useState(new Set());
+interface ParsedInput {
+  value: JsonValue | undefined;
+  error: ToolboxError | null;
+}
 
-  const parsed = useMemo(() => {
+export default function TreeView({ input }: { input: string }) {
+  const [collapsedPaths, setCollapsedPaths] = useState<Set<string>>(new Set());
+
+  const parsed = useMemo<ParsedInput>(() => {
     if (!input.trim()) return { value: undefined, error: null };
     try {
-      return { value: JSON.parse(input), error: null };
-    } catch (e) {
+      return { value: JSON.parse(input) as JsonValue, error: null };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
       return {
         value: undefined,
-        error: { message: e.message, location: locateError(input, e.message) },
+        error: { message, location: locateError(input, message) },
       };
     }
   }, [input]);
 
-  const toggle = useCallback((path) => {
+  const toggle = useCallback((path: string) => {
     setCollapsedPaths((prev) => {
       const next = new Set(prev);
       if (next.has(path)) next.delete(path);

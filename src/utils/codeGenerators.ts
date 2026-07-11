@@ -1,4 +1,13 @@
-function toPascalCase(value) {
+import type { ConvertTarget, JsonValue } from "../types";
+
+interface Field {
+  key: string;
+  sample: JsonValue;
+}
+
+type ClassMap = Map<string, Field[]>;
+
+function toPascalCase(value: string): string {
   return String(value)
     .replace(/[^a-zA-Z0-9]+/g, " ")
     .trim()
@@ -8,26 +17,26 @@ function toPascalCase(value) {
     .join("") || "Root";
 }
 
-function toCamelCase(value) {
+function toCamelCase(value: string): string {
   const pascal = toPascalCase(value);
   return pascal.charAt(0).toLowerCase() + pascal.slice(1);
 }
 
-function singularize(value) {
+function singularize(value: string): string {
   return value.endsWith("s") && value.length > 1 ? value.slice(0, -1) : value;
 }
 
-function mergeValues(values) {
+function mergeValues(values: JsonValue[]): JsonValue {
   const present = values.filter((value) => value !== null && value !== undefined);
   return present.length ? present[0] : null;
 }
 
-function inferFields(value) {
+function inferFields(value: JsonValue): Field[] {
   if (!value || typeof value !== "object" || Array.isArray(value)) return [];
   return Object.entries(value).map(([key, fieldValue]) => ({ key, sample: fieldValue }));
 }
 
-function collectClasses(value, className, classes = new Map()) {
+function collectClasses(value: JsonValue, className: string, classes: ClassMap = new Map()): ClassMap {
   const root = Array.isArray(value) ? mergeValues(value) : value;
   if (!root || typeof root !== "object" || Array.isArray(root)) return classes;
   if (classes.has(className)) return classes;
@@ -51,7 +60,7 @@ function collectClasses(value, className, classes = new Map()) {
   return classes;
 }
 
-function dartType(value, key) {
+function dartType(value: JsonValue | undefined, key: string): string {
   if (value === null || value === undefined) return "dynamic";
   if (Array.isArray(value)) {
     const item = mergeValues(value);
@@ -63,7 +72,7 @@ function dartType(value, key) {
   return "String";
 }
 
-function jsType(value, key) {
+function jsType(value: JsonValue | undefined, key: string): string {
   if (value === null || value === undefined) return "any";
   if (Array.isArray(value)) return `${jsType(mergeValues(value), singularize(key))}[]`;
   if (typeof value === "object") return toPascalCase(key);
@@ -72,7 +81,7 @@ function jsType(value, key) {
   return "string";
 }
 
-function csharpType(value, key) {
+function csharpType(value: JsonValue | undefined, key: string): string {
   if (value === null || value === undefined) return "object";
   if (Array.isArray(value)) return `List<${csharpType(mergeValues(value), singularize(key))}>`;
   if (typeof value === "object") return toPascalCase(key);
@@ -81,7 +90,7 @@ function csharpType(value, key) {
   return "string";
 }
 
-function generateDart(value, rootName) {
+function generateDart(value: JsonValue, rootName: string): string {
   const classes = collectClasses(value, rootName);
   return [...classes.entries()]
     .map(([className, fields]) => {
@@ -118,7 +127,7 @@ function generateDart(value, rootName) {
     .join("\n\n");
 }
 
-function generateJsDto(value, rootName) {
+function generateJsDto(value: JsonValue, rootName: string): string {
   const classes = collectClasses(value, rootName);
   return [...classes.entries()]
     .map(([className, fields]) => {
@@ -129,7 +138,7 @@ function generateJsDto(value, rootName) {
     .join("\n\n");
 }
 
-function generateCSharpEntity(value, rootName) {
+function generateCSharpEntity(value: JsonValue, rootName: string): string {
   const classes = collectClasses(value, rootName);
   return `using System.Collections.Generic;\n\n${[...classes.entries()]
     .map(([className, fields]) => {
@@ -139,8 +148,8 @@ function generateCSharpEntity(value, rootName) {
     .join("\n\n")}`;
 }
 
-export function convertJsonToCode(input, target, rootName = "Root") {
-  const parsed = JSON.parse(input);
+export function convertJsonToCode(input: string, target: ConvertTarget, rootName = "Root"): string {
+  const parsed = JSON.parse(input) as JsonValue;
   const className = toPascalCase(rootName);
 
   if (target === "dart") return generateDart(parsed, className);

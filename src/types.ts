@@ -1,0 +1,34 @@
+export type JsonPrimitive = string | number | boolean | null;
+export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
+
+export type ToolboxAction = "beautify" | "minify" | "stringify" | "convert" | "diff" | "schema";
+export type TransformAction = Exclude<ToolboxAction, "diff" | "schema">;
+export type ConvertTarget = "dart" | "js" | "csharp";
+export type ToolboxView = "text" | "tree";
+
+export interface ErrorLocation {
+  line: number;
+  col: number;
+  pos: number;
+}
+
+export interface ToolboxError {
+  message: string;
+  location?: ErrorLocation | null;
+}
+
+export type DiffChange =
+  | { type: "added" | "removed"; path: string; value: JsonValue }
+  | { type: "changed"; path: string; before: JsonValue; after: JsonValue };
+
+export interface SchemaValidationError {
+  path: string;
+  keyword: string;
+  message: string;
+  params: Record<string, unknown>;
+}
+
+export interface SchemaResult {
+  valid: boolean;
+  errors: SchemaValidationError[];
+}

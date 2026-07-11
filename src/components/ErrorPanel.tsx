@@ -1,7 +1,8 @@
 import React from "react";
 import { AlertTriangle } from "lucide-react";
+import type { ToolboxError } from "../types";
 
-export default function ErrorPanel({ error }) {
+export default function ErrorPanel({ error }: { error: ToolboxError }) {
   return (
     <div className="flex-1 min-h-[360px] bg-neutral-950 p-4">
       <div className="flex items-start gap-2 rounded-md border border-red-900/50 bg-red-950/30 px-3 py-2.5">

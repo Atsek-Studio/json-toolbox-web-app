@@ -1,14 +1,18 @@
 import React from "react";
-import { AlignLeft, Braces, Code2, ListTree, Minimize2, Quote, Trash2 } from "lucide-react";
+import { AlignLeft, Braces, Code2, GitCompareArrows, ListTree, Minimize2, Quote, ShieldCheck, Trash2 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import type { ConvertTarget, ToolboxAction, ToolboxView } from "../types";
 
-const ACTIONS = [
+const ACTIONS: { key: ToolboxAction; label: string; icon: LucideIcon }[] = [
   { key: "beautify", label: "Beautify", icon: Braces },
   { key: "minify", label: "Minify", icon: Minimize2 },
   { key: "stringify", label: "Stringify", icon: Quote },
   { key: "convert", label: "Convert", icon: Code2 },
+  { key: "diff", label: "Diff", icon: GitCompareArrows },
+  { key: "schema", label: "Schema", icon: ShieldCheck },
 ];
 
-function actionClassName(isActive) {
+function actionClassName(isActive: boolean): string {
   return `inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
     isActive
       ? "bg-teal-600 border-teal-500 text-white shadow-sm shadow-teal-950"
@@ -16,10 +20,24 @@ function actionClassName(isActive) {
   }`;
 }
 
-function segmentedClassName(isActive) {
+function segmentedClassName(isActive: boolean): string {
   return `inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs transition-colors ${
     isActive ? "bg-neutral-700 text-neutral-100" : "bg-transparent text-neutral-500 hover:text-neutral-300"
   }`;
+}
+
+interface ToolbarProps {
+  onAction: (action: ToolboxAction) => void;
+  activeAction: ToolboxAction | null;
+  onClear: () => void;
+  view: ToolboxView;
+  onViewChange: (view: ToolboxView) => void;
+  convertTarget: ConvertTarget;
+  onConvertTargetChange: (target: ConvertTarget) => void;
+  rootName: string;
+  onRootNameChange: (name: string) => void;
+  onCompare: () => void;
+  onValidateSchema: () => void;
 }
 
 export default function Toolbar({
@@ -32,7 +50,9 @@ export default function Toolbar({
   onConvertTargetChange,
   rootName,
   onRootNameChange,
-}) {
+  onCompare,
+  onValidateSchema,
+}: ToolbarProps) {
   const showConvertOptions = activeAction === "convert";
 
   return (
@@ -62,7 +82,7 @@ export default function Toolbar({
             <span className="mr-1">Target</span>
             <select
               value={convertTarget}
-              onChange={(e) => onConvertTargetChange(e.target.value)}
+              onChange={(e) => onConvertTargetChange(e.target.value as ConvertTarget)}
               className="h-7 rounded border border-neutral-700 bg-neutral-950 px-2 text-xs text-neutral-100 outline-none focus:border-teal-500/70"
             >
               <option value="dart">Dart model</option>
@@ -80,9 +100,29 @@ export default function Toolbar({
         </>
       )}
 
+      {activeAction === "diff" && (
+        <button
+          onClick={onCompare}
+          className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500 bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-emerald-950 transition-colors hover:bg-emerald-500"
+        >
+          <GitCompareArrows className="h-3.5 w-3.5" />
+          Compare JSON
+        </button>
+      )}
+
+      {activeAction === "schema" && (
+        <button
+          onClick={onValidateSchema}
+          className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500 bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-emerald-950 transition-colors hover:bg-emerald-500"
+        >
+          <ShieldCheck className="h-3.5 w-3.5" />
+          Validate JSON
+        </button>
+      )}
+
       <div className="flex-1" />
 
-      <div className="inline-flex items-center rounded-md border border-neutral-800 overflow-hidden">
+      {activeAction !== "diff" && activeAction !== "schema" && <div className="inline-flex items-center rounded-md border border-neutral-800 overflow-hidden">
         <button
           onClick={() => onViewChange("text")}
           className={segmentedClassName(view === "text")}
@@ -99,7 +139,7 @@ export default function Toolbar({
           <ListTree className="w-3.5 h-3.5" />
           Tree
         </button>
-      </div>
+      </div>}
 
       <button
         onClick={onClear}

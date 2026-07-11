@@ -1,8 +1,17 @@
 import React from "react";
 import { FileJson2 } from "lucide-react";
-import { formatBytes } from "../utils/jsonTools.js";
+import { formatBytes } from "../utils/jsonTools";
+import type { ToolboxAction } from "../types";
 
-export default function Header({ inputBytes, outputBytes, lastAction, hasError }) {
+interface HeaderProps {
+  inputBytes: number;
+  outputBytes: number;
+  lastAction: ToolboxAction | null;
+  hasError: boolean;
+  diffCount?: number | null;
+}
+
+export default function Header({ inputBytes, outputBytes, lastAction, hasError, diffCount = null }: HeaderProps) {
   return (
     <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-800 bg-neutral-900/60">
       <div className="flex items-center gap-2.5">
@@ -11,7 +20,7 @@ export default function Header({ inputBytes, outputBytes, lastAction, hasError }
         </div>
         <div>
           <h1 className="text-sm font-semibold text-neutral-100 leading-tight">JSON Toolbox</h1>
-          <p className="text-xs text-neutral-500 leading-tight">Beautify, minify, stringify and explore JSON</p>
+          <p className="text-xs text-neutral-500 leading-tight">Format, convert, compare and explore JSON</p>
         </div>
       </div>
       <div className="flex items-center gap-3 text-xs text-neutral-500">
@@ -20,7 +29,7 @@ export default function Header({ inputBytes, outputBytes, lastAction, hasError }
           <>
             <span className="text-neutral-700">to</span>
             <span className={hasError ? "text-red-400" : "text-teal-400"}>
-              {hasError ? "error" : formatBytes(outputBytes)}
+              {hasError ? "error" : lastAction === "diff" ? `${diffCount} changes` : lastAction === "schema" ? "validator" : formatBytes(outputBytes)}
             </span>
           </>
         )}

@@ -9,7 +9,15 @@ const BRACKET_COLORS = [
   "text-pink-400",
 ];
 
-const TOKEN_COLORS = {
+type JsonTokenType = "key" | "string" | "number" | "boolean" | "null" | "punctuation" | "whitespace" | "bracket";
+
+export interface JsonToken {
+  type: JsonTokenType;
+  value: string;
+  depth?: number;
+}
+
+const TOKEN_COLORS: Record<Exclude<JsonTokenType, "bracket">, string> = {
   key: "text-sky-300",
   string: "text-emerald-400",
   number: "text-orange-300",
@@ -19,7 +27,7 @@ const TOKEN_COLORS = {
   whitespace: "text-neutral-200",
 };
 
-function readString(source, start) {
+function readString(source: string, start: number): string {
   let end = start + 1;
   let escaped = false;
 
@@ -39,7 +47,7 @@ function readString(source, start) {
   return source.slice(start, end);
 }
 
-function isObjectKey(source, end) {
+function isObjectKey(source: string, end: number): boolean {
   for (let i = end; i < source.length; i += 1) {
     const char = source[i];
     if (/\s/.test(char)) continue;
@@ -48,8 +56,8 @@ function isObjectKey(source, end) {
   return false;
 }
 
-export function tokenizeJson(source) {
-  const tokens = [];
+export function tokenizeJson(source: string): JsonToken[] {
+  const tokens: JsonToken[] = [];
   let depth = 0;
   let i = 0;
 
@@ -116,14 +124,14 @@ export function tokenizeJson(source) {
   return tokens;
 }
 
-export function tokenClassName(token) {
+export function tokenClassName(token: JsonToken): string {
   if (token.type === "bracket") {
-    return `${BRACKET_COLORS[token.depth % BRACKET_COLORS.length]} font-semibold`;
+    return `${BRACKET_COLORS[(token.depth ?? 0) % BRACKET_COLORS.length]} font-semibold`;
   }
   return TOKEN_COLORS[token.type] ?? "text-neutral-200";
 }
 
-export default function JsonHighlight({ value }) {
+export default function JsonHighlight({ value }: { value: string }) {
   if (!value) {
     return (
       <div className="editor-surface flex-1 min-h-[360px] bg-neutral-950 p-4 text-[13px] leading-relaxed font-mono text-neutral-700">

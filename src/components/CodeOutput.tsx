@@ -31,14 +31,21 @@ const KEYWORDS = new Set([
   "var",
 ]);
 
-function tokenizeCode(source) {
-  const tokens = [];
+type CodeTokenType = "bracket" | "comment" | "keyword" | "number" | "plain" | "punctuation" | "space" | "string" | "type";
+
+interface CodeToken {
+  type: CodeTokenType;
+  value: string;
+}
+
+function tokenizeCode(source: string): CodeToken[] {
+  const tokens: CodeToken[] = [];
   const pattern =
     /(\/\/.*|\/\*[\s\S]*?\*\/|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\b\d+(?:\.\d+)?\b|\b[A-Za-z_][A-Za-z0-9_]*\b|[{}()[\]<>.,:;=]|\s+|.)/g;
 
   for (const match of source.matchAll(pattern)) {
     const value = match[0];
-    let type = "plain";
+    let type: CodeTokenType = "plain";
 
     if (/^\/\//.test(value) || /^\/\*/.test(value)) type = "comment";
     else if (/^["'`]/.test(value)) type = "string";
@@ -55,8 +62,8 @@ function tokenizeCode(source) {
   return tokens;
 }
 
-function tokenClassName(type) {
-  const colors = {
+function tokenClassName(type: CodeTokenType): string {
+  const colors: Record<CodeTokenType, string> = {
     bracket: "text-rose-300 font-semibold",
     comment: "text-neutral-500 italic",
     keyword: "text-violet-300",
@@ -71,7 +78,7 @@ function tokenClassName(type) {
   return colors[type] ?? colors.plain;
 }
 
-export default function CodeOutput({ value }) {
+export default function CodeOutput({ value }: { value: string }) {
   if (!value) {
     return (
       <div className="editor-surface flex-1 min-h-[360px] bg-neutral-950 p-4 text-[13px] leading-relaxed font-mono text-neutral-700">

@@ -1,6 +1,6 @@
 import React from "react";
-import AppShell from "./components/AppShell.jsx";
-import JsonToolboxPage from "./pages/JsonToolboxPage.jsx";
+import AppShell from "./components/AppShell";
+import JsonToolboxPage from "./pages/JsonToolboxPage";
 
 export default function App() {
   return (

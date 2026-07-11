@@ -1,7 +1,7 @@
 # JSON Toolbox
 
 A small React + Vite app for working with JSON: beautify, minify, stringify,
-and explore JSON in an interactive tree view.
+compare, and explore JSON in an interactive tree view.
 
 ## Getting started
 
@@ -23,27 +23,27 @@ npm run preview
 
 ```text
 src/
-|-- App.jsx                  # App composition
-|-- main.jsx                 # React entry point
+|-- App.tsx                  # App composition
+|-- main.tsx                 # React entry point
 |-- index.css                # Tailwind directives
 |-- components/
-|   |-- AppShell.jsx         # Centered application frame
-|   |-- Header.jsx           # Title bar and size stats
-|   |-- Toolbar.jsx          # Action buttons, indent selector, view toggle
-|   |-- PanelHeader.jsx      # Shared panel title row
-|   |-- IconButton.jsx       # Shared icon-only button styles
-|   |-- InputPanel.jsx       # Raw JSON input
-|   |-- OutputPanel.jsx      # Text output panel
-|   |-- ErrorPanel.jsx       # Shared invalid-JSON error display
-|   |-- TreeView.jsx         # Tree view container
-|   `-- TreeNode.jsx         # Recursive tree node renderer
+|   |-- AppShell.tsx         # Centered application frame
+|   |-- Header.tsx           # Title bar and size stats
+|   |-- Toolbar.tsx          # Action buttons, indent selector, view toggle
+|   |-- PanelHeader.tsx      # Shared panel title row
+|   |-- IconButton.tsx       # Shared icon-only button styles
+|   |-- InputPanel.tsx       # Raw JSON input
+|   |-- OutputPanel.tsx      # Text output panel
+|   |-- ErrorPanel.tsx       # Shared invalid-JSON error display
+|   |-- TreeView.tsx         # Tree view container
+|   `-- TreeNode.tsx         # Recursive tree node renderer
 |-- hooks/
-|   `-- useJsonToolbox.js    # JSON toolbox state and actions
+|   `-- useJsonToolbox.ts    # JSON toolbox state and actions
 |-- pages/
-|   `-- JsonToolboxPage.jsx  # Page-level layout for the toolbox
+|   `-- JsonToolboxPage.tsx  # Page-level layout for the toolbox
 `-- utils/
-    |-- jsonTools.js         # Pure JSON helpers
-    `-- sampleJson.js        # Default editor content
+    |-- jsonTools.ts         # Pure JSON helpers
+    `-- sampleJson.ts        # Default editor content
 ```
 
 ## Features
@@ -52,6 +52,8 @@ src/
 - Minify: collapse to a single line and show size reduction
 - Stringify: wrap the raw input as an escaped JSON string literal
 - Convert JSON to Dart models, JavaScript DTO classes, or C# entity classes
+- Diff two JSON documents with added, removed, and changed JSONPath entries
+- Validate JSON against JSON Schema with path-based error details
 - Tree view: collapsible, color-coded tree for parsed input
 - Inline invalid JSON errors with line and column
 - Copy-to-clipboard and swap-output-into-input
@@ -59,7 +61,7 @@ src/
 ## Extension points
 
 - Add a new screen under `src/pages/` and mount it from `App.jsx`.
-- Add new JSON actions in `src/utils/jsonTools.js`, then expose them through
-  `src/components/Toolbar.jsx` and `src/hooks/useJsonToolbox.js`.
-- Add or refine code generators in `src/utils/codeGenerators.js`.
+- Add new JSON actions in `src/utils/jsonTools.ts`, then expose them through
+  `src/components/Toolbar.tsx` and `src/hooks/useJsonToolbox.ts`.
+- Add or refine code generators in `src/utils/codeGenerators.ts`.
 - Add reusable visual pieces under `src/components/`.

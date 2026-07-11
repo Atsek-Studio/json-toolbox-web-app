@@ -1,10 +1,16 @@
 import React, { useRef } from "react";
-import { tokenizeJson, tokenClassName } from "./JsonHighlight.jsx";
+import type { UIEvent } from "react";
+import { tokenizeJson, tokenClassName } from "./JsonHighlight";
 
-export default function JsonEditor({ value, onChange }) {
-  const previewRef = useRef(null);
+interface JsonEditorProps {
+  value: string;
+  onChange: (value: string) => void;
+}
 
-  const handleScroll = (event) => {
+export default function JsonEditor({ value, onChange }: JsonEditorProps) {
+  const previewRef = useRef<HTMLPreElement>(null);
+
+  const handleScroll = (event: UIEvent<HTMLTextAreaElement>) => {
     if (!previewRef.current) return;
     previewRef.current.scrollTop = event.currentTarget.scrollTop;
     previewRef.current.scrollLeft = event.currentTarget.scrollLeft;
