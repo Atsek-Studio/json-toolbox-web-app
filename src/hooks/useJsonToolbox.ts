@@ -26,6 +26,26 @@ const SAMPLE_SCHEMA = `{
   "additionalProperties": true
 }`;
 
+const SAMPLE_HTML = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTML Preview</title>
+    <style>
+      body { font-family: system-ui, sans-serif; padding: 2rem; color: #172033; }
+      .card { max-width: 32rem; padding: 1.5rem; border: 1px solid #dbe2ea; border-radius: 1rem; }
+      h1 { margin-top: 0; color: #0f766e; }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>Hello, HTML!</h1>
+      <p>Edit this document to see the preview update instantly.</p>
+    </main>
+  </body>
+</html>`;
+
 export function useJsonToolbox() {
   const [input, setInput] = useState(SAMPLE_JSON);
   const [output, setOutput] = useState("");
@@ -41,9 +61,11 @@ export function useJsonToolbox() {
   const [diffHasCompared, setDiffHasCompared] = useState(false);
   const [schemaInput, setSchemaInput] = useState(SAMPLE_SCHEMA);
   const [schemaResult, setSchemaResult] = useState<SchemaResult | null>(null);
+  const [htmlInput, setHtmlInput] = useState(SAMPLE_HTML);
 
   const inputBytes = useMemo(() => new Blob([input]).size, [input]);
   const outputBytes = useMemo(() => new Blob([output]).size, [output]);
+  const htmlBytes = useMemo(() => new Blob([htmlInput]).size, [htmlInput]);
 
   const handleInputChange = useCallback((value: string) => {
     setInput(value);
@@ -163,6 +185,8 @@ export function useJsonToolbox() {
     setLastAction(null);
   }, [output]);
 
+  const handleClearHtml = useCallback(() => setHtmlInput(""), []);
+
   const reduction =
     lastAction === "minify" && !error && inputBytes > 0
       ? Math.max(0, Math.round((1 - outputBytes / inputBytes) * 100))
@@ -187,6 +211,7 @@ export function useJsonToolbox() {
     setRootName: handleRootNameChange,
     inputBytes,
     outputBytes,
+    htmlBytes,
     reduction,
     isValid,
     diffInput,
@@ -196,11 +221,14 @@ export function useJsonToolbox() {
     schemaInput,
     setSchemaInput: handleSchemaInputChange,
     schemaResult,
+    htmlInput,
+    setHtmlInput,
     handleAction,
     handleCompare,
     handleValidateSchema,
     handleCopy,
     handleClear,
     handleSwap,
+    handleClearHtml,
   };
 }

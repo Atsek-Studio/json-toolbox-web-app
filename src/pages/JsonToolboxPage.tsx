@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../components/Header";
 import InputPanel from "../components/InputPanel";
 import OutputPanel from "../components/OutputPanel";
@@ -6,21 +6,29 @@ import Toolbar from "../components/Toolbar";
 import TreeView from "../components/TreeView";
 import DiffResult from "../components/DiffResult";
 import SchemaResult from "../components/SchemaResult";
+import HtmlPreview from "../components/HtmlPreview";
+import WorkspaceTabs from "../components/WorkspaceTabs";
+import type { WorkspaceTab } from "../types";
 import { useJsonToolbox } from "../hooks/useJsonToolbox";
 
 export default function JsonToolboxPage() {
   const toolbox = useJsonToolbox();
+  const [workspace, setWorkspace] = useState<WorkspaceTab>("json");
 
   return (
     <section className="w-full bg-neutral-950 text-neutral-200 rounded-xl border border-neutral-800 overflow-hidden font-sans">
       <Header
-        inputBytes={toolbox.inputBytes}
+        inputBytes={workspace === "html" ? toolbox.htmlBytes : toolbox.inputBytes}
         outputBytes={toolbox.outputBytes}
         lastAction={toolbox.lastAction}
         hasError={Boolean(toolbox.error)}
         diffCount={toolbox.diffChanges.length}
+        workspace={workspace}
       />
-      <Toolbar
+      <WorkspaceTabs activeTab={workspace} onChange={setWorkspace} />
+      {workspace === "html" ? (
+        <HtmlPreview value={toolbox.htmlInput} onChange={toolbox.setHtmlInput} onClear={toolbox.handleClearHtml} />
+      ) : <><Toolbar
         onAction={toolbox.handleAction}
         activeAction={toolbox.lastAction}
         onClear={toolbox.handleClear}
@@ -67,7 +75,7 @@ export default function JsonToolboxPage() {
         ) : (
           <TreeView input={toolbox.input} />
         )}
-      </div>}
+      </div>}</>}
     </section>
   );
 }

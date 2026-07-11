@@ -3,6 +3,7 @@ export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue
 
 export type ToolboxAction = "beautify" | "minify" | "stringify" | "convert" | "diff" | "schema";
 export type TransformAction = Exclude<ToolboxAction, "diff" | "schema">;
+export type WorkspaceTab = "json" | "html";
 export type ConvertTarget = "dart" | "js" | "csharp";
 export type ToolboxView = "text" | "tree";
 

@@ -58,6 +58,16 @@ Schema mode provides editors for JSON data and a JSON Schema, followed by an exp
 - Separately reports malformed JSON, malformed schemas, and schema validation failures.
 - Hides stale results after the data or schema changes.
 
+### Preview HTML
+
+The dedicated **HTML Viewer** tab provides a code editor and a live browser preview side by side.
+
+- Paste or write a complete HTML document or fragment.
+- See HTML and CSS changes render immediately.
+- Run embedded JavaScript inside an isolated iframe sandbox.
+- Load externally referenced styles, images, and scripts when allowed by their servers.
+- Keep preview code isolated from the JSON Toolbox page and its origin.
+
 ## Technology
 
 - React 18
@@ -107,6 +117,7 @@ npm run preview
 3. Select **Tree** to explore the current input recursively.
 4. Select **Diff**, paste the original and modified documents, and press **Compare JSON**.
 5. Select **Schema**, paste JSON data and a schema, and press **Validate JSON**.
+6. Switch to the **HTML Viewer** tab and paste markup to render it in the live preview.
 
 Invalid JSON is shown inline with the native parser message and, when available, its line and column.
 
@@ -132,6 +143,7 @@ Invalid JSON is shown inline with the native parser message and, when available,
     |-- components/
     |   |-- AppShell.tsx          # Responsive application frame
     |   |-- Header.tsx            # Title and byte/change statistics
+    |   |-- WorkspaceTabs.tsx     # JSON and HTML workspace navigation
     |   |-- Toolbar.tsx           # Tool, view, target, and run controls
     |   |-- InputPanel.tsx        # Labeled JSON editor panel
     |   |-- JsonEditor.tsx        # Editable syntax-highlighted JSON surface
@@ -142,6 +154,7 @@ Invalid JSON is shown inline with the native parser message and, when available,
     |   |-- TreeNode.tsx          # Recursive JSON tree node
     |   |-- DiffResult.tsx        # Split diff renderer
     |   |-- SchemaResult.tsx      # Schema validation result list
+    |   |-- HtmlPreview.tsx       # Sandboxed HTML editor and live preview
     |   |-- ErrorPanel.tsx        # Shared parsing and processing error display
     |   |-- PanelHeader.tsx       # Shared panel title bar
     |   `-- IconButton.tsx        # Shared icon-only button
@@ -190,6 +203,8 @@ Place shared visual components in `src/components/` and keep domain processing i
 - Empty or mixed-type arrays provide limited type information to code generators.
 - Clipboard access depends on browser permissions and a secure browser context.
 - JSON Schema support follows the Ajv configuration used in `src/utils/jsonTools.ts`.
+- HTML previews run in a sandboxed iframe with scripts enabled but without same-origin access.
+- External preview resources still depend on network availability and their server security policies.
 
 ## License
 
