@@ -1,8 +1,33 @@
+<div align="center">
+
 # JSON Toolbox
 
-JSON Toolbox is a browser-based developer utility for working with JSON, previewing HTML, and converting SQL table definitions into application models. It is built with React, strict TypeScript, Vite, and Tailwind CSS.
+### Format JSON, preview HTML, and turn SQL tables into application models.
 
-All JSON processing happens locally in the browser. The application does not upload editor content to a server.
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![CI](https://github.com/Atsek-Studio/json-toolbox-web-app/actions/workflows/ci.yml/badge.svg)](https://github.com/Atsek-Studio/json-toolbox-web-app/actions/workflows/ci.yml)
+
+A private, browser-based developer workspace built with React, strict TypeScript, Vite, and Tailwind CSS.
+
+**All processing happens locally in your browser. Editor content is never uploaded to a server.**
+
+[Features](#features) · [Quick start](#getting-started) · [Project structure](#project-structure) · [Development](#development-workflow)
+
+</div>
+
+## At a glance
+
+| Workspace | What it does | Key outputs |
+| --- | --- | --- |
+| **JSON Toolbox** | Format, inspect, compare, validate, and convert JSON | Dart models, TypeScript DTOs, C# entities |
+| **HTML Viewer** | Render HTML/CSS/JavaScript in an isolated live preview | Sandboxed page with captured console output |
+| **SQL Converter** | Parse DDL from four SQL dialects | EF Core entities, C# models, TypeScript DTOs, Dart models |
+
+> [!NOTE]
+> The app is intentionally client-only. JSON, HTML, SQL, generated code, and console output remain on the local device.
 
 ## Features
 
