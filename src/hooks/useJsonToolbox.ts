@@ -4,6 +4,7 @@ import { compareJson, processJson, validateJsonSchema } from "../utils/jsonTools
 import type {
   ConvertTarget,
   DiffChange,
+  FieldNameFormat,
   SchemaResult,
   ToolboxAction,
   ToolboxError,
@@ -56,6 +57,7 @@ export function useJsonToolbox() {
   const [view, setView] = useState<ToolboxView>("text");
   const [convertTarget, setConvertTarget] = useState<ConvertTarget>("dart");
   const [rootName, setRootName] = useState("Root");
+  const [fieldNameFormat, setFieldNameFormat] = useState<FieldNameFormat>("language-default");
   const [diffInput, setDiffInput] = useState(SAMPLE_JSON);
   const [diffChanges, setDiffChanges] = useState<DiffChange[]>([]);
   const [diffHasCompared, setDiffHasCompared] = useState(false);
@@ -99,12 +101,12 @@ export function useJsonToolbox() {
         setLastAction(action);
         return;
       }
-      const result = processJson(action as TransformAction, input, indent, { convertTarget, rootName });
+      const result = processJson(action as TransformAction, input, indent, { convertTarget, rootName, fieldNameFormat });
       setOutput(result.output);
       setError(result.error);
       setLastAction(action);
     },
-    [convertTarget, diffInput, input, indent, rootName]
+    [convertTarget, diffInput, fieldNameFormat, input, indent, rootName]
   );
 
   const handleCompare = useCallback(() => {
@@ -131,11 +133,12 @@ export function useJsonToolbox() {
       const result = processJson("convert", input, indent, {
         convertTarget: nextTarget,
         rootName,
+        fieldNameFormat,
       });
       setOutput(result.output);
       setError(result.error);
     },
-    [input, indent, lastAction, rootName]
+    [fieldNameFormat, input, indent, lastAction, rootName]
   );
 
   const handleRootNameChange = useCallback(
@@ -147,11 +150,27 @@ export function useJsonToolbox() {
       const result = processJson("convert", input, indent, {
         convertTarget,
         rootName: nextRootName,
+        fieldNameFormat,
       });
       setOutput(result.output);
       setError(result.error);
     },
-    [convertTarget, input, indent, lastAction]
+    [convertTarget, fieldNameFormat, input, indent, lastAction]
+  );
+
+  const handleFieldNameFormatChange = useCallback(
+    (nextFormat: FieldNameFormat) => {
+      setFieldNameFormat(nextFormat);
+      if (lastAction !== "convert") return;
+      const result = processJson("convert", input, indent, {
+        convertTarget,
+        rootName,
+        fieldNameFormat: nextFormat,
+      });
+      setOutput(result.output);
+      setError(result.error);
+    },
+    [convertTarget, input, indent, lastAction, rootName],
   );
 
   const handleCopy = useCallback(async () => {
@@ -209,6 +228,8 @@ export function useJsonToolbox() {
     setConvertTarget: handleConvertTargetChange,
     rootName,
     setRootName: handleRootNameChange,
+    fieldNameFormat,
+    setFieldNameFormat: handleFieldNameFormatChange,
     inputBytes,
     outputBytes,
     htmlBytes,

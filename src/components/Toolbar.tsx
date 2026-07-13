@@ -1,7 +1,7 @@
 import React from "react";
 import { AlignLeft, Braces, Code2, GitCompareArrows, ListTree, Minimize2, Quote, ShieldCheck, Trash2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import type { ConvertTarget, ToolboxAction, ToolboxView } from "../types";
+import type { ConvertTarget, FieldNameFormat, ToolboxAction, ToolboxView } from "../types";
 
 const ACTIONS: { key: ToolboxAction; label: string; icon: LucideIcon }[] = [
   { key: "beautify", label: "Beautify", icon: Braces },
@@ -36,6 +36,8 @@ interface ToolbarProps {
   onConvertTargetChange: (target: ConvertTarget) => void;
   rootName: string;
   onRootNameChange: (name: string) => void;
+  fieldNameFormat: FieldNameFormat;
+  onFieldNameFormatChange: (format: FieldNameFormat) => void;
   onCompare: () => void;
   onValidateSchema: () => void;
 }
@@ -50,6 +52,8 @@ export default function Toolbar({
   onConvertTargetChange,
   rootName,
   onRootNameChange,
+  fieldNameFormat,
+  onFieldNameFormatChange,
   onCompare,
   onValidateSchema,
 }: ToolbarProps) {
@@ -97,6 +101,20 @@ export default function Toolbar({
             placeholder="Root class"
             className="h-7 w-28 rounded border border-neutral-700 bg-neutral-950 px-2 text-xs text-neutral-100 outline-none placeholder-neutral-600 focus:border-teal-500/70"
           />
+
+          <label className="inline-flex items-center gap-1 text-xs text-neutral-500">
+            <span className="mr-1">Fields</span>
+            <select
+              value={fieldNameFormat}
+              onChange={(event) => onFieldNameFormatChange(event.target.value as FieldNameFormat)}
+              className="h-7 rounded border border-neutral-700 bg-neutral-950 px-2 text-xs text-neutral-100 outline-none focus:border-teal-500/70"
+            >
+              <option value="language-default">Language default</option>
+              <option value="camel">camelCase</option>
+              <option value="pascal">PascalCase</option>
+              <option value="snake">snake_case</option>
+            </select>
+          </label>
         </>
       )}
 

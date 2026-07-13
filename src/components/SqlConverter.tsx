@@ -1,6 +1,6 @@
 import React from "react";
 import { Check, Copy, Database, Play, Trash2 } from "lucide-react";
-import type { SqlConvertTarget, SqlDialect, ToolboxError } from "../types";
+import type { FieldNameFormat, SqlConvertTarget, SqlDialect, ToolboxError } from "../types";
 import CodeOutput from "./CodeOutput";
 import ErrorPanel from "./ErrorPanel";
 import PanelHeader from "./PanelHeader";
@@ -10,6 +10,8 @@ interface SqlConverterProps {
   onInputChange: (value: string) => void;
   dialect: SqlDialect;
   onDialectChange: (dialect: SqlDialect) => void;
+  fieldNameFormat: FieldNameFormat;
+  onFieldNameFormatChange: (format: FieldNameFormat) => void;
   target: SqlConvertTarget;
   onTargetChange: (target: SqlConvertTarget) => void;
   output: string;
@@ -27,7 +29,7 @@ const targets: { key: SqlConvertTarget; label: string }[] = [
   { key: "dart", label: "Dart Model" },
 ];
 
-export default function SqlConverter({ input, onInputChange, dialect, onDialectChange, target, onTargetChange, output, error, copied, onConvert, onCopy, onClear }: SqlConverterProps) {
+export default function SqlConverter({ input, onInputChange, dialect, onDialectChange, fieldNameFormat, onFieldNameFormatChange, target, onTargetChange, output, error, copied, onConvert, onCopy, onClear }: SqlConverterProps) {
   return (
     <>
       <div className="flex flex-wrap items-center gap-2 border-b border-neutral-800 bg-neutral-900/30 px-5 py-3">
@@ -38,6 +40,15 @@ export default function SqlConverter({ input, onInputChange, dialect, onDialectC
             <option value="postgresql">PostgreSQL</option>
             <option value="mysql">MySQL</option>
             <option value="oracle">Oracle</option>
+          </select>
+        </label>
+        <label className="inline-flex items-center gap-2 text-xs text-neutral-500">
+          Fields
+          <select value={fieldNameFormat} onChange={(event) => onFieldNameFormatChange(event.target.value as FieldNameFormat)} className="h-7 rounded border border-neutral-700 bg-neutral-950 px-2 text-xs text-neutral-100 outline-none focus:border-teal-500/70">
+            <option value="language-default">Language default</option>
+            <option value="camel">camelCase</option>
+            <option value="pascal">PascalCase</option>
+            <option value="snake">snake_case</option>
           </select>
         </label>
         <div className="mx-1 h-5 w-px bg-neutral-800" />

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import type { SqlConvertTarget, SqlDialect, ToolboxError } from "../types";
+import type { FieldNameFormat, SqlConvertTarget, SqlDialect, ToolboxError } from "../types";
 import { generateFromSql } from "../utils/sqlGenerators";
 import { parseCreateTable } from "../utils/sqlParser";
 
@@ -16,6 +16,7 @@ export function useSqlConverter() {
   const [input, setInput] = useState(SAMPLE_SQL);
   const [target, setTarget] = useState<SqlConvertTarget>("csharp-entity");
   const [dialect, setDialect] = useState<SqlDialect>("sqlserver");
+  const [fieldNameFormat, setFieldNameFormat] = useState<FieldNameFormat>("language-default");
   const [output, setOutput] = useState("");
   const [error, setError] = useState<ToolboxError | null>(null);
   const [copied, setCopied] = useState(false);
@@ -30,13 +31,13 @@ export function useSqlConverter() {
   const generate = useCallback((selectedTarget: SqlConvertTarget) => {
     setCopied(false);
     try {
-      setOutput(generateFromSql(parseCreateTable(input, dialect), selectedTarget));
+      setOutput(generateFromSql(parseCreateTable(input, dialect), selectedTarget, fieldNameFormat));
       setError(null);
     } catch (caught) {
       setOutput("");
       setError({ message: caught instanceof Error ? caught.message : String(caught) });
     }
-  }, [dialect, input]);
+  }, [dialect, fieldNameFormat, input]);
 
   const changeDialect = useCallback((nextDialect: SqlDialect) => {
     setDialect(nextDialect);
@@ -50,6 +51,18 @@ export function useSqlConverter() {
     setTarget(nextTarget);
     if (output) generate(nextTarget);
   }, [generate, output]);
+
+  const changeFieldNameFormat = useCallback((nextFormat: FieldNameFormat) => {
+    setFieldNameFormat(nextFormat);
+    if (!output) return;
+    try {
+      setOutput(generateFromSql(parseCreateTable(input, dialect), target, nextFormat));
+      setError(null);
+    } catch (caught) {
+      setOutput("");
+      setError({ message: caught instanceof Error ? caught.message : String(caught) });
+    }
+  }, [dialect, input, output, target]);
 
   const copy = useCallback(async () => {
     if (!output) return;
@@ -68,5 +81,5 @@ export function useSqlConverter() {
     setError(null);
   }, []);
 
-  return { input, inputBytes, setInput: updateInput, dialect, setDialect: changeDialect, target, setTarget: changeTarget, output, error, copied, convert, copy, clear };
+  return { input, inputBytes, setInput: updateInput, dialect, setDialect: changeDialect, fieldNameFormat, setFieldNameFormat: changeFieldNameFormat, target, setTarget: changeTarget, output, error, copied, convert, copy, clear };
 }

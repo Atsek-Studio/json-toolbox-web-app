@@ -1,4 +1,5 @@
-import type { ConvertTarget, JsonValue } from "../types";
+import type { ConvertTarget, FieldNameFormat, JsonValue } from "../types";
+import { formatFieldName, formatTypeName } from "./naming";
 
 interface Field {
   key: string;
@@ -7,23 +8,8 @@ interface Field {
 
 type ClassMap = Map<string, Field[]>;
 
-function toPascalCase(value: string): string {
-  return String(value)
-    .replace(/[^a-zA-Z0-9]+/g, " ")
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join("") || "Root";
-}
-
-function toCamelCase(value: string): string {
-  const pascal = toPascalCase(value);
-  return pascal.charAt(0).toLowerCase() + pascal.slice(1);
-}
-
 function singularize(value: string): string {
-  return value.endsWith("s") && value.length > 1 ? value.slice(0, -1) : value;
+  return value.toLowerCase().endsWith("s") && value.length > 1 ? value.slice(0, -1) : value;
 }
 
 function mergeValues(values: JsonValue[]): JsonValue {
@@ -49,10 +35,10 @@ function collectClasses(value: JsonValue, className: string, classes: ClassMap =
       if (Array.isArray(field.sample)) {
         const item = mergeValues(field.sample);
         if (item && typeof item === "object" && !Array.isArray(item)) {
-          collectClasses(item, toPascalCase(singularize(field.key)), classes);
+          collectClasses(item, formatTypeName(singularize(field.key)), classes);
         }
       } else {
-        collectClasses(field.sample, toPascalCase(field.key), classes);
+        collectClasses(field.sample, formatTypeName(field.key), classes);
       }
     }
   }
@@ -66,7 +52,7 @@ function dartType(value: JsonValue | undefined, key: string): string {
     const item = mergeValues(value);
     return `List<${dartType(item, singularize(key))}>`;
   }
-  if (typeof value === "object") return toPascalCase(key);
+  if (typeof value === "object") return formatTypeName(key);
   if (typeof value === "number") return Number.isInteger(value) ? "int" : "double";
   if (typeof value === "boolean") return "bool";
   return "String";
@@ -80,7 +66,7 @@ function typescriptType(value: JsonValue | undefined, key: string): string {
     const combinedType = includesNull ? `${itemType} | null` : itemType;
     return combinedType.includes("|") ? `(${combinedType})[]` : `${combinedType}[]`;
   }
-  if (typeof value === "object") return toPascalCase(key);
+  if (typeof value === "object") return formatTypeName(key);
   if (typeof value === "number") return "number";
   if (typeof value === "boolean") return "boolean";
   return "string";
@@ -89,35 +75,35 @@ function typescriptType(value: JsonValue | undefined, key: string): string {
 function csharpType(value: JsonValue | undefined, key: string): string {
   if (value === null || value === undefined) return "object";
   if (Array.isArray(value)) return `List<${csharpType(mergeValues(value), singularize(key))}>`;
-  if (typeof value === "object") return toPascalCase(key);
+  if (typeof value === "object") return formatTypeName(key);
   if (typeof value === "number") return Number.isInteger(value) ? "int" : "double";
   if (typeof value === "boolean") return "bool";
   return "string";
 }
 
-function generateDart(value: JsonValue, rootName: string): string {
+function generateDart(value: JsonValue, rootName: string, fieldNameFormat: FieldNameFormat): string {
   const classes = collectClasses(value, rootName);
   return [...classes.entries()]
     .map(([className, fields]) => {
-      const props = fields.map((field) => `  final ${dartType(field.sample, field.key)} ${toCamelCase(field.key)};`);
-      const ctorArgs = fields.map((field) => `    required this.${toCamelCase(field.key)},`);
+      const props = fields.map((field) => `  final ${dartType(field.sample, field.key)} ${formatFieldName(field.key, fieldNameFormat, "camel")};`);
+      const ctorArgs = fields.map((field) => `    required this.${formatFieldName(field.key, fieldNameFormat, "camel")},`);
       const fromJson = fields.map((field) => {
-        const name = toCamelCase(field.key);
+        const name = formatFieldName(field.key, fieldNameFormat, "camel");
         const type = dartType(field.sample, field.key);
         if (Array.isArray(field.sample) && type.startsWith("List<") && typeof mergeValues(field.sample) === "object") {
-          const itemClass = toPascalCase(singularize(field.key));
+          const itemClass = formatTypeName(singularize(field.key));
           return `      ${name}: (json['${field.key}'] as List).map((item) => ${itemClass}.fromJson(item)).toList(),`;
         }
         if (Array.isArray(field.sample)) {
           return `      ${name}: List<${dartType(mergeValues(field.sample), singularize(field.key))}>.from(json['${field.key}']),`;
         }
         if (field.sample && typeof field.sample === "object" && !Array.isArray(field.sample)) {
-          return `      ${name}: ${toPascalCase(field.key)}.fromJson(json['${field.key}']),`;
+          return `      ${name}: ${formatTypeName(field.key)}.fromJson(json['${field.key}']),`;
         }
         return `      ${name}: json['${field.key}'],`;
       });
       const toJson = fields.map((field) => {
-        const name = toCamelCase(field.key);
+        const name = formatFieldName(field.key, fieldNameFormat, "camel");
         if (Array.isArray(field.sample) && typeof mergeValues(field.sample) === "object") {
           return `      '${field.key}': ${name}.map((item) => item.toJson()).toList(),`;
         }
@@ -132,36 +118,36 @@ function generateDart(value: JsonValue, rootName: string): string {
     .join("\n\n");
 }
 
-function generateTypescriptDto(value: JsonValue, rootName: string): string {
+function generateTypescriptDto(value: JsonValue, rootName: string, fieldNameFormat: FieldNameFormat): string {
   const classes = collectClasses(value, rootName);
   return [...classes.entries()]
     .map(([className, fields]) => {
       const properties = fields.map((field) => {
         const optional = field.sample === null ? "?" : "";
-        return `  ${toCamelCase(field.key)}${optional}: ${typescriptType(field.sample, field.key)};`;
+        return `  ${formatFieldName(field.key, fieldNameFormat, "camel")}${optional}: ${typescriptType(field.sample, field.key)};`;
       });
       return `export interface ${className} {\n${properties.join("\n")}\n}`;
     })
     .join("\n\n");
 }
 
-function generateCSharpEntity(value: JsonValue, rootName: string): string {
+function generateCSharpEntity(value: JsonValue, rootName: string, fieldNameFormat: FieldNameFormat): string {
   const classes = collectClasses(value, rootName);
   return `using System.Collections.Generic;\n\n${[...classes.entries()]
     .map(([className, fields]) => {
-      const props = fields.map((field) => `    public ${csharpType(field.sample, field.key)} ${toPascalCase(field.key)} { get; set; }`);
+      const props = fields.map((field) => `    public ${csharpType(field.sample, field.key)} ${formatFieldName(field.key, fieldNameFormat, "pascal")} { get; set; }`);
       return `public class ${className}\n{\n${props.join("\n")}\n}`;
     })
     .join("\n\n")}`;
 }
 
-export function convertJsonToCode(input: string, target: ConvertTarget, rootName = "Root"): string {
+export function convertJsonToCode(input: string, target: ConvertTarget, rootName = "Root", fieldNameFormat: FieldNameFormat = "language-default"): string {
   const parsed = JSON.parse(input) as JsonValue;
-  const className = toPascalCase(rootName);
+  const className = formatTypeName(rootName);
 
-  if (target === "dart") return generateDart(parsed, className);
-  if (target === "typescript") return generateTypescriptDto(parsed, className);
-  if (target === "csharp") return generateCSharpEntity(parsed, className);
+  if (target === "dart") return generateDart(parsed, className, fieldNameFormat);
+  if (target === "typescript") return generateTypescriptDto(parsed, className, fieldNameFormat);
+  if (target === "csharp") return generateCSharpEntity(parsed, className, fieldNameFormat);
 
   throw new Error("Unknown convert target");
 }

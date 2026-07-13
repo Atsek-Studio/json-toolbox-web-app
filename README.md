@@ -50,6 +50,15 @@ Generate typed structures from representative JSON data:
 
 The root class name can be changed before generating code. Nested objects and arrays of objects generate additional classes.
 
+Choose how generated field names are formatted:
+
+- **Language default:** camelCase for TypeScript and Dart; PascalCase for C#.
+- **camelCase**
+- **PascalCase**
+- **snake_case**
+
+Uppercase, snake case, kebab case, and existing camel/Pascal identifiers are normalized consistently. For example, `SUPPLIERS_CODE` becomes `suppliersCode`, `SuppliersCode`, or `suppliers_code` according to the selected format.
+
 ### Explore JSON as a tree
 
 - Recursively browse objects and arrays.
@@ -109,6 +118,8 @@ The dedicated **SQL Converter** tab parses a `CREATE TABLE` statement into a sha
 - **Dart models** with constructors plus `fromJson` and `toJson` methods.
 
 The parser recognizes schema-qualified and quoted table names, common SQL types, nullability, inline or table-level primary keys, identity columns, unique columns, defaults, lengths, and decimal precision.
+
+SQL-generated field names use the same selectable language-default, camelCase, PascalCase, and snake_case formatting modes as JSON conversion. Original database column names remain unchanged inside EF Core `[Column]` mappings and serialization keys.
 
 Select the source database dialect before converting:
 

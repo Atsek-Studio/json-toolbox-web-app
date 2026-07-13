@@ -4,6 +4,7 @@ import type {
   ConvertTarget,
   DiffChange,
   ErrorLocation,
+  FieldNameFormat,
   JsonValue,
   SchemaValidationError,
   ToolboxError,
@@ -43,6 +44,7 @@ export function formatBytes(n: number): string {
 interface ProcessOptions {
   convertTarget?: ConvertTarget;
   rootName?: string;
+  fieldNameFormat?: FieldNameFormat;
 }
 
 export function processJson(
@@ -67,7 +69,7 @@ export function processJson(
     }
     if (action === "convert") {
       return {
-        output: convertJsonToCode(input, options.convertTarget ?? "dart", options.rootName),
+        output: convertJsonToCode(input, options.convertTarget ?? "dart", options.rootName, options.fieldNameFormat),
         error: null,
       };
     }

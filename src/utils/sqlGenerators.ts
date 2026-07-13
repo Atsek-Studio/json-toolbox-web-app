@@ -1,14 +1,5 @@
-import type { SqlColumn, SqlConvertTarget, SqlDialect, SqlTable } from "../types";
-
-function pascalCase(value: string): string {
-  const result = value.replace(/[^A-Za-z0-9]+/g, " ").trim().split(/\s+/).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join("");
-  return result || "Entity";
-}
-
-function camelCase(value: string): string {
-  const pascal = pascalCase(value);
-  return pascal.charAt(0).toLowerCase() + pascal.slice(1);
-}
+import type { FieldNameFormat, SqlColumn, SqlConvertTarget, SqlDialect, SqlTable } from "../types";
+import { formatFieldName, formatTypeName } from "./naming";
 
 function csharpType(column: SqlColumn, dialect: SqlDialect): string {
   const types: Record<string, string> = {
@@ -28,8 +19,8 @@ function csharpType(column: SqlColumn, dialect: SqlDialect): string {
   return column.nullable ? `${type}?` : type;
 }
 
-function generateCsharpEntity(table: SqlTable): string {
-  const className = pascalCase(table.name);
+function generateCsharpEntity(table: SqlTable, fieldNameFormat: FieldNameFormat): string {
+  const className = formatTypeName(table.name, "Entity");
   const primaryKeys = table.columns.filter((column) => column.primaryKey);
   const properties = table.columns.map((column) => {
     const attributes: string[] = [];
@@ -40,20 +31,20 @@ function generateCsharpEntity(table: SqlTable): string {
     attributes.push(`[Column("${column.name}", TypeName = "${column.sqlType.toLowerCase()}")]`);
     const type = csharpType(column, table.dialect);
     const initializer = type === "string" && !column.nullable ? " = null!;" : "";
-    return `    ${attributes.join("\n    ")}\n    public ${type} ${pascalCase(column.name)} { get; set; }${initializer}`;
+    return `    ${attributes.join("\n    ")}\n    public ${type} ${formatFieldName(column.name, fieldNameFormat, "pascal")} { get; set; }${initializer}`;
   });
   const tableAttribute = table.schema ? `[Table("${table.name}", Schema = "${table.schema}")]` : `[Table("${table.name}")]`;
-  const compositeKey = primaryKeys.length > 1 ? `[PrimaryKey(${primaryKeys.map((column) => `nameof(${pascalCase(column.name)})`).join(", ")})]\n` : "";
+  const compositeKey = primaryKeys.length > 1 ? `[PrimaryKey(${primaryKeys.map((column) => `nameof(${formatFieldName(column.name, fieldNameFormat, "pascal")})`).join(", ")})]\n` : "";
   const efImport = primaryKeys.length > 1 ? "using Microsoft.EntityFrameworkCore;\n" : "";
   return `using System;\nusing System.ComponentModel.DataAnnotations;\nusing System.ComponentModel.DataAnnotations.Schema;\n${efImport}\n${tableAttribute}\n${compositeKey}public class ${className}\n{\n${properties.join("\n\n")}\n}`;
 }
 
-function generateCsharpModel(table: SqlTable): string {
-  const className = `${pascalCase(table.name)}Model`;
+function generateCsharpModel(table: SqlTable, fieldNameFormat: FieldNameFormat): string {
+  const className = `${formatTypeName(table.name, "Entity")}Model`;
   const properties = table.columns.map((column) => {
     const type = csharpType(column, table.dialect);
     const initializer = type === "string" || type === "byte[]" ? " = null!;" : "";
-    return `    public ${type} ${pascalCase(column.name)} { get; set; }${initializer}`;
+    return `    public ${type} ${formatFieldName(column.name, fieldNameFormat, "pascal")} { get; set; }${initializer}`;
   });
   return `using System;\n\npublic class ${className}\n{\n${properties.join("\n\n")}\n}`;
 }
@@ -69,12 +60,12 @@ function typescriptType(column: SqlColumn, dialect: SqlDialect): string {
   return "string";
 }
 
-function generateTypescriptDto(table: SqlTable): string {
-  const className = `${pascalCase(table.name)}Dto`;
+function generateTypescriptDto(table: SqlTable, fieldNameFormat: FieldNameFormat): string {
+  const className = `${formatTypeName(table.name, "Entity")}Dto`;
   const properties = table.columns.map((column) => {
     const optional = column.nullable ? "?" : "";
     const nullable = column.nullable ? " | null" : "";
-    return `  ${camelCase(column.name)}${optional}: ${typescriptType(column, table.dialect)}${nullable};`;
+    return `  ${formatFieldName(column.name, fieldNameFormat, "camel")}${optional}: ${typescriptType(column, table.dialect)}${nullable};`;
   });
   return `export interface ${className} {\n${properties.join("\n")}\n}`;
 }
@@ -89,28 +80,28 @@ function dartType(column: SqlColumn, dialect: SqlDialect): string {
   return type;
 }
 
-function generateDart(table: SqlTable): string {
-  const className = pascalCase(table.name);
-  const fields = table.columns.map((column) => `  final ${dartType(column, table.dialect)} ${camelCase(column.name)};`).join("\n");
-  const constructor = table.columns.map((column) => `    ${column.nullable ? "" : "required "}this.${camelCase(column.name)},`).join("\n");
+function generateDart(table: SqlTable, fieldNameFormat: FieldNameFormat): string {
+  const className = formatTypeName(table.name, "Entity");
+  const fields = table.columns.map((column) => `  final ${dartType(column, table.dialect)} ${formatFieldName(column.name, fieldNameFormat, "camel")};`).join("\n");
+  const constructor = table.columns.map((column) => `    ${column.nullable ? "" : "required "}this.${formatFieldName(column.name, fieldNameFormat, "camel")},`).join("\n");
   const fromJson = table.columns.map((column) => {
-    const name = camelCase(column.name);
+    const name = formatFieldName(column.name, fieldNameFormat, "camel");
     const type = dartType(column, table.dialect).replace("?", "");
     const source = `json['${column.name}']`;
     const value = type === "DateTime" ? `${source} == null ? null : DateTime.parse(${source})` : type === "double" ? `(${source} as num${column.nullable ? "?" : ""})${column.nullable ? "?" : ""}.toDouble()` : source;
     return `      ${name}: ${value},`;
   }).join("\n");
   const toJson = table.columns.map((column) => {
-    const name = camelCase(column.name);
+    const name = formatFieldName(column.name, fieldNameFormat, "camel");
     const value = dartType(column, table.dialect).startsWith("DateTime") ? `${name}${column.nullable ? "?" : ""}.toIso8601String()` : name;
     return `      '${column.name}': ${value},`;
   }).join("\n");
   return `class ${className} {\n${fields}\n\n  const ${className}({\n${constructor}\n  });\n\n  factory ${className}.fromJson(Map<String, dynamic> json) {\n    return ${className}(\n${fromJson}\n    );\n  }\n\n  Map<String, dynamic> toJson() {\n    return {\n${toJson}\n    };\n  }\n}`;
 }
 
-export function generateFromSql(table: SqlTable, target: SqlConvertTarget): string {
-  if (target === "csharp-entity") return generateCsharpEntity(table);
-  if (target === "csharp-model") return generateCsharpModel(table);
-  if (target === "typescript-dto") return generateTypescriptDto(table);
-  return generateDart(table);
+export function generateFromSql(table: SqlTable, target: SqlConvertTarget, fieldNameFormat: FieldNameFormat = "language-default"): string {
+  if (target === "csharp-entity") return generateCsharpEntity(table, fieldNameFormat);
+  if (target === "csharp-model") return generateCsharpModel(table, fieldNameFormat);
+  if (target === "typescript-dto") return generateTypescriptDto(table, fieldNameFormat);
+  return generateDart(table, fieldNameFormat);
 }

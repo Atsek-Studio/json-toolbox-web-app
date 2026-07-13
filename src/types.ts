@@ -6,6 +6,7 @@ export type TransformAction = Exclude<ToolboxAction, "diff" | "schema">;
 export type WorkspaceTab = "json" | "html" | "sql";
 export type SqlConvertTarget = "csharp-entity" | "csharp-model" | "typescript-dto" | "dart";
 export type SqlDialect = "sqlserver" | "postgresql" | "mysql" | "oracle";
+export type FieldNameFormat = "language-default" | "camel" | "pascal" | "snake";
 
 export interface SqlColumn {
   name: string;
