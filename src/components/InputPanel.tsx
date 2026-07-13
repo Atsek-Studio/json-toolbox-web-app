@@ -12,7 +12,7 @@ export default function InputPanel({ value, onChange, title = "INPUT" }: InputPa
   return (
     <div className="flex flex-col">
       <PanelHeader title={title}>
-        <span className="text-xs text-neutral-600">{value.length} chars</span>
+        <span className="font-mono text-xs text-[#98a1af]">{value.length} chars</span>
       </PanelHeader>
       <JsonEditor value={value} onChange={onChange} />
     </div>

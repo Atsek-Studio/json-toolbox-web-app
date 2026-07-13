@@ -66,14 +66,14 @@ export default function DiffResult({ changes, error, hasCompared, beforeText, af
   let afterLine = 0;
 
   return (
-    <div className="flex flex-col border-t border-neutral-800">
+    <div className="flex flex-col border-t border-[#1a1e24]">
       <PanelHeader title="DIFFERENCES" meta={!error && hasCompared ? <span className="inline-flex items-center gap-2 text-xs text-neutral-500"><Columns2 className="h-3.5 w-3.5" />Split view · {changes.length} {changes.length === 1 ? "change" : "changes"}</span> : null} />
       {error ? <ErrorPanel error={error} /> : hasCompared && changes.length === 0 ? (
-        <div className="min-h-32 flex items-center justify-center gap-2 text-sm text-teal-400"><Check className="w-4 h-4" />The JSON values are identical</div>
+        <div className="flex min-h-32 items-center justify-center gap-2 text-sm text-emerald-400"><Check className="h-4 w-4" />The JSON values are identical</div>
       ) : !hasCompared ? (
         <div className="min-h-32 flex items-center justify-center text-sm text-neutral-600">Edit either document, then select Diff to compare.</div>
       ) : (
-        <div className="editor-scrollbar overflow-auto border-t border-neutral-800 bg-neutral-950">
+        <div className="editor-scrollbar overflow-auto border-t border-[#1a1e24] bg-[#0d0f13]">
           <div className="grid min-w-[760px] grid-cols-2 divide-x divide-neutral-700">
             <div className="border-b border-neutral-700 bg-neutral-900 px-4 py-2 text-xs font-medium text-neutral-400">Original</div>
             <div className="border-b border-neutral-700 bg-neutral-900 px-4 py-2 text-xs font-medium text-neutral-400">Modified</div>

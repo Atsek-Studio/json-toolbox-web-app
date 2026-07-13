@@ -13,7 +13,7 @@ export default function SchemaResult({ result, error }: SchemaResultProps) {
   const errorCount = result?.errors.length || 0;
 
   return (
-    <div className="flex flex-col border-t border-neutral-800">
+    <div className="flex flex-col border-t border-[#1a1e24]">
       <PanelHeader
         title="VALIDATION RESULT"
         meta={result && !error ? <span className={`text-xs ${result.valid ? "text-emerald-400" : "text-red-400"}`}>{result.valid ? "Valid" : `${errorCount} ${errorCount === 1 ? "error" : "errors"}`}</span> : null}

@@ -5,29 +5,63 @@
 html,
 body,
 #root {
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
-  background-color: #0a0a0a;
+  margin: 0;
+  background:
+    radial-gradient(70rem 36rem at 15% -10%, #171b22 0%, transparent 58%),
+    #0a0c0f;
+  color: #edf0f3;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.font-mono {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.tool-shell {
+  overflow: hidden;
+  border: 1px solid #23282f;
+  border-radius: 16px;
+  background: #12151a;
+  box-shadow: 0 40px 80px -30px rgb(0 0 0 / 60%);
+}
+
+.surface-bar {
+  background: linear-gradient(180deg, #14171c 0%, #101317 100%);
+}
+
+.control-surface {
+  background: #0d0f13;
+  border-color: #2a3038;
 }
 
 .editor-surface {
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(20, 184, 166, 0.08), transparent 18rem);
+    linear-gradient(90deg, rgba(96, 165, 250, 0.055), transparent 18rem);
   background-size: 100% 1.7rem, 100% 100%;
+  background-color: #0d0f13;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
   tab-size: 2;
 }
 
 .editor-surface::selection,
 .editor-surface *::selection {
-  background: rgba(20, 184, 166, 0.28);
+  background: rgba(96, 165, 250, 0.24);
 }
 
 .editor-scrollbar {
-  scrollbar-color: #3f3f46 #0a0a0a;
+  scrollbar-color: #3a4049 #0d0f13;
   scrollbar-width: thin;
 }
 
@@ -39,22 +73,22 @@ body {
 
 .editor-scrollbar::-webkit-scrollbar-track,
 .editor-surface::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: #0d0f13;
 }
 
 .editor-scrollbar::-webkit-scrollbar-thumb,
 .editor-surface::-webkit-scrollbar-thumb {
-  background: #262626;
-  border: 2px solid #0a0a0a;
+  background: #2a3038;
+  border: 2px solid #0d0f13;
   border-radius: 999px;
 }
 
 .editor-scrollbar::-webkit-scrollbar-thumb:hover,
 .editor-surface::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: #414955;
 }
 
 .editor-scrollbar::-webkit-scrollbar-corner,
 .editor-surface::-webkit-scrollbar-corner {
-  background: #0a0a0a;
+  background: #0d0f13;
 }

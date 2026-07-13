@@ -4,7 +4,7 @@ import type { ButtonHTMLAttributes } from "react";
 export default function IconButton({ children, className = "", ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
-      className={`p-1.5 rounded text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors ${className}`}
+      className={`rounded-md border border-transparent p-1.5 text-[#575f6b] transition-colors hover:border-[#2a3038] hover:bg-[#171b21] hover:text-[#edf0f3] disabled:opacity-30 disabled:hover:border-transparent disabled:hover:bg-transparent ${className}`}
       {...props}
     >
       {children}

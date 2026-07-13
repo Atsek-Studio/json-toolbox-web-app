@@ -3,26 +3,30 @@ import { AlignLeft, Braces, Code2, GitCompareArrows, ListTree, Minimize2, Quote,
 import type { LucideIcon } from "lucide-react";
 import type { ConvertTarget, FieldNameFormat, ToolboxAction, ToolboxView } from "../types";
 
-const ACTIONS: { key: ToolboxAction; label: string; icon: LucideIcon }[] = [
-  { key: "beautify", label: "Beautify", icon: Braces },
-  { key: "minify", label: "Minify", icon: Minimize2 },
-  { key: "stringify", label: "Stringify", icon: Quote },
-  { key: "convert", label: "Convert", icon: Code2 },
-  { key: "diff", label: "Diff", icon: GitCompareArrows },
-  { key: "schema", label: "Schema", icon: ShieldCheck },
+const ACTION_GROUPS: { key: ToolboxAction; label: string; icon: LucideIcon }[][] = [
+  [
+    { key: "beautify", label: "Beautify", icon: Braces },
+    { key: "minify", label: "Minify", icon: Minimize2 },
+    { key: "stringify", label: "Stringify", icon: Quote },
+  ],
+  [
+    { key: "convert", label: "Convert", icon: Code2 },
+    { key: "diff", label: "Diff", icon: GitCompareArrows },
+    { key: "schema", label: "Schema", icon: ShieldCheck },
+  ],
 ];
 
 function actionClassName(isActive: boolean): string {
-  return `inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
+  return `inline-flex items-center gap-1.5 whitespace-nowrap rounded-[7px] border px-3 py-1.5 text-xs font-medium transition-colors ${
     isActive
-      ? "bg-teal-600 border-teal-500 text-white shadow-sm shadow-teal-950"
-      : "bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border-neutral-700"
+      ? "border-[#294c73] bg-[#60a5fa]/15 text-[#60a5fa]"
+      : "border-transparent bg-transparent text-[#98a1af] hover:bg-[#171b21] hover:text-[#edf0f3]"
   }`;
 }
 
 function segmentedClassName(isActive: boolean): string {
-  return `inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs transition-colors ${
-    isActive ? "bg-neutral-700 text-neutral-100" : "bg-transparent text-neutral-500 hover:text-neutral-300"
+  return `inline-flex items-center gap-1.5 rounded-[7px] px-2.5 py-1.5 text-xs transition-colors ${
+    isActive ? "bg-[#171b21] text-[#edf0f3]" : "bg-transparent text-[#575f6b] hover:text-[#edf0f3]"
   }`;
 }
 
@@ -60,54 +64,114 @@ export default function Toolbar({
   const showConvertOptions = activeAction === "convert";
 
   return (
-    <div className="flex flex-wrap items-center gap-2 px-5 py-3 border-b border-neutral-800 bg-neutral-900/30">
-      {ACTIONS.map((action) => {
-        const Icon = action.icon;
-        const isActive = activeAction === action.key;
+    <div className="surface-bar border-b border-[#1a1e24]">
+      <div className="flex flex-wrap items-center gap-2.5 px-4 py-3 sm:px-5 sm:py-4">
+        {ACTION_GROUPS.map((group, groupIndex) => (
+          <div key={groupIndex} className="control-surface flex gap-1 rounded-[10px] border p-1">
+            {group.map((action) => {
+              const Icon = action.icon;
+              const isActive = activeAction === action.key;
 
-        return (
+              return (
+                <button
+                  key={action.key}
+                  onClick={() => onAction(action.key)}
+                  className={actionClassName(isActive)}
+                  aria-pressed={isActive}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {action.label}
+                </button>
+              );
+            })}
+          </div>
+        ))}
+
+        {activeAction === "diff" && (
           <button
-            key={action.key}
-            onClick={() => onAction(action.key)}
-            className={actionClassName(isActive)}
-            aria-pressed={isActive}
+            onClick={onCompare}
+            className="inline-flex items-center gap-1.5 rounded-[7px] border border-[#294c73] bg-[#60a5fa]/15 px-3 py-2 text-xs font-semibold text-[#60a5fa] transition-colors hover:bg-[#60a5fa]/20"
           >
-            <Icon className="w-3.5 h-3.5" />
-            {action.label}
+            <GitCompareArrows className="h-3.5 w-3.5" />
+            Compare JSON
           </button>
-        );
-      })}
+        )}
 
-      <div className="w-px h-5 bg-neutral-800 mx-1" />
+        {activeAction === "schema" && (
+          <button
+            onClick={onValidateSchema}
+            className="inline-flex items-center gap-1.5 rounded-[7px] border border-[#294c73] bg-[#60a5fa]/15 px-3 py-2 text-xs font-semibold text-[#60a5fa] transition-colors hover:bg-[#60a5fa]/20"
+          >
+            <ShieldCheck className="h-3.5 w-3.5" />
+            Validate JSON
+          </button>
+        )}
+
+        <div className="flex-1" />
+
+        {activeAction !== "diff" && activeAction !== "schema" && <div className="control-surface inline-flex items-center gap-1 rounded-[10px] border p-1">
+          <button
+            onClick={() => onViewChange("text")}
+            className={segmentedClassName(view === "text")}
+            aria-pressed={view === "text"}
+          >
+            <AlignLeft className="w-3.5 h-3.5" />
+            Text
+          </button>
+          <button
+            onClick={() => onViewChange("tree")}
+            className={segmentedClassName(view === "tree")}
+            aria-pressed={view === "tree"}
+          >
+            <ListTree className="w-3.5 h-3.5" />
+            Tree
+          </button>
+        </div>}
+
+        <button
+          onClick={onClear}
+          className="inline-flex items-center gap-1.5 rounded-[7px] px-2.5 py-2 text-xs text-[#575f6b] transition-colors hover:bg-[#171b21] hover:text-[#edf0f3]"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+          Clear
+        </button>
+      </div>
 
       {showConvertOptions && (
-        <>
-          <div className="inline-flex items-center gap-1 text-xs text-neutral-500">
-            <span className="mr-1">Target</span>
+        <div className="flex flex-wrap items-end gap-3 border-t border-[#1a1e24] bg-[#0d0f13]/65 px-4 py-3 sm:px-5">
+          <span className="self-center text-[10px] font-semibold uppercase tracking-wider text-[#575f6b]">
+            Convert settings
+          </span>
+
+          <label className="flex min-w-40 flex-1 flex-col gap-1 text-[10px] font-medium uppercase tracking-wide text-[#575f6b] sm:max-w-56">
+            Target
             <select
               value={convertTarget}
-              onChange={(e) => onConvertTargetChange(e.target.value as ConvertTarget)}
-              className="h-7 rounded border border-neutral-700 bg-neutral-950 px-2 text-xs text-neutral-100 outline-none focus:border-teal-500/70"
+              onChange={(event) => onConvertTargetChange(event.target.value as ConvertTarget)}
+              className="control-surface h-8 rounded-[7px] border px-2.5 text-xs normal-case tracking-normal text-[#edf0f3] outline-none focus:border-[#60a5fa]"
             >
               <option value="dart">Dart model</option>
               <option value="typescript">TypeScript DTO</option>
               <option value="csharp">C# entity</option>
             </select>
-          </div>
+          </label>
 
-          <input
-            value={rootName}
-            onChange={(e) => onRootNameChange(e.target.value)}
-            placeholder="Root class"
-            className="h-7 w-28 rounded border border-neutral-700 bg-neutral-950 px-2 text-xs text-neutral-100 outline-none placeholder-neutral-600 focus:border-teal-500/70"
-          />
+          <label className="flex min-w-36 flex-1 flex-col gap-1 text-[10px] font-medium uppercase tracking-wide text-[#575f6b] sm:max-w-48">
+            Root class
+            <input
+              value={rootName}
+              onChange={(event) => onRootNameChange(event.target.value)}
+              placeholder="Root"
+              className="control-surface h-8 rounded-[7px] border px-2.5 font-mono text-xs normal-case tracking-normal text-[#edf0f3] outline-none placeholder:text-[#575f6b] focus:border-[#60a5fa]"
+            />
+          </label>
 
-          <label className="inline-flex items-center gap-1 text-xs text-neutral-500">
-            <span className="mr-1">Fields</span>
+          <label className="flex min-w-44 flex-1 flex-col gap-1 text-[10px] font-medium uppercase tracking-wide text-[#575f6b] sm:max-w-60">
+            Field naming
             <select
               value={fieldNameFormat}
               onChange={(event) => onFieldNameFormatChange(event.target.value as FieldNameFormat)}
-              className="h-7 rounded border border-neutral-700 bg-neutral-950 px-2 text-xs text-neutral-100 outline-none focus:border-teal-500/70"
+              className="control-surface h-8 rounded-[7px] border px-2.5 text-xs normal-case tracking-normal text-[#edf0f3] outline-none focus:border-[#60a5fa]"
             >
               <option value="language-default">Language default</option>
               <option value="camel">camelCase</option>
@@ -115,57 +179,8 @@ export default function Toolbar({
               <option value="snake">snake_case</option>
             </select>
           </label>
-        </>
+        </div>
       )}
-
-      {activeAction === "diff" && (
-        <button
-          onClick={onCompare}
-          className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500 bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-emerald-950 transition-colors hover:bg-emerald-500"
-        >
-          <GitCompareArrows className="h-3.5 w-3.5" />
-          Compare JSON
-        </button>
-      )}
-
-      {activeAction === "schema" && (
-        <button
-          onClick={onValidateSchema}
-          className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500 bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-emerald-950 transition-colors hover:bg-emerald-500"
-        >
-          <ShieldCheck className="h-3.5 w-3.5" />
-          Validate JSON
-        </button>
-      )}
-
-      <div className="flex-1" />
-
-      {activeAction !== "diff" && activeAction !== "schema" && <div className="inline-flex items-center rounded-md border border-neutral-800 overflow-hidden">
-        <button
-          onClick={() => onViewChange("text")}
-          className={segmentedClassName(view === "text")}
-          aria-pressed={view === "text"}
-        >
-          <AlignLeft className="w-3.5 h-3.5" />
-          Text
-        </button>
-        <button
-          onClick={() => onViewChange("tree")}
-          className={segmentedClassName(view === "tree")}
-          aria-pressed={view === "tree"}
-        >
-          <ListTree className="w-3.5 h-3.5" />
-          Tree
-        </button>
-      </div>}
-
-      <button
-        onClick={onClear}
-        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800 transition-colors"
-      >
-        <Trash2 className="w-3.5 h-3.5" />
-        Clear
-      </button>
     </div>
   );
 }

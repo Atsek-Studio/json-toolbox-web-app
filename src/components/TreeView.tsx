@@ -62,11 +62,11 @@ export default function TreeView({ input }: { input: string }) {
       {parsed.error ? (
         <ErrorPanel error={parsed.error} />
       ) : parsed.value === undefined ? (
-        <div className="flex-1 min-h-[360px] bg-neutral-950 p-4 text-xs text-neutral-600">
+        <div className="min-h-[480px] flex-1 bg-[#0d0f13] p-4 text-xs text-[#575f6b]">
           Paste JSON on the left to explore it here.
         </div>
       ) : (
-        <div className="editor-scrollbar flex-1 min-h-[360px] max-h-[520px] overflow-auto bg-neutral-950 py-3 px-2 text-[13px] font-mono">
+        <div className="editor-scrollbar min-h-[480px] max-h-[620px] flex-1 overflow-auto bg-[#0d0f13] px-2 py-3 font-mono text-[13px]">
           <TreeNode
             label={null}
             value={parsed.value}

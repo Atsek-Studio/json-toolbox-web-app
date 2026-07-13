@@ -68,28 +68,28 @@ export default function HtmlPreview({ value, onChange, onClear }: HtmlPreviewPro
   const previewDocument = useMemo(() => buildPreviewDocument(renderedHtml, previewId), [previewId, renderedHtml]);
 
   return (
-    <div className="grid grid-cols-1 divide-y divide-neutral-800 md:grid-cols-2 md:divide-x md:divide-y-0">
+    <div className="grid grid-cols-1 divide-y divide-[#1a1e24] md:grid-cols-2 md:divide-x md:divide-y-0">
       <section className="flex min-w-0 flex-col">
-        <PanelHeader title="HTML CODE" meta={<span className="inline-flex items-center gap-1 text-xs text-neutral-600"><Code2 className="h-3 w-3" />{value.length} chars</span>}>
-          <button onClick={onClear} className="inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs text-neutral-500 transition-colors hover:bg-neutral-800 hover:text-neutral-300"><Trash2 className="h-3.5 w-3.5" />Clear</button>
+        <PanelHeader title="HTML CODE" meta={<span className="inline-flex items-center gap-1 font-mono text-xs text-[#98a1af]"><Code2 className="h-3 w-3" />{value.length} chars</span>}>
+          <button onClick={onClear} className="inline-flex items-center gap-1.5 rounded-[7px] px-2 py-1 text-xs text-[#575f6b] transition-colors hover:bg-[#171b21] hover:text-[#edf0f3]"><Trash2 className="h-3.5 w-3.5" />Clear</button>
         </PanelHeader>
-        <div className="editor-surface relative min-h-[520px] flex-1 bg-neutral-950">
+        <div className="editor-surface relative min-h-[520px] flex-1">
           {!value && <div className="pointer-events-none absolute inset-0 p-4 font-mono text-[13px] text-neutral-700">Paste HTML here...</div>}
-          <textarea value={value} onChange={(event) => onChange(event.target.value)} spellCheck={false} aria-label="HTML code" className="editor-scrollbar relative z-10 h-full min-h-[520px] w-full resize-none bg-transparent p-4 font-mono text-[13px] leading-relaxed text-neutral-200 outline-none selection:bg-teal-500/30 focus:ring-1 focus:ring-inset focus:ring-teal-500/30" />
+          <textarea value={value} onChange={(event) => onChange(event.target.value)} spellCheck={false} aria-label="HTML code" className="editor-scrollbar relative z-10 h-full min-h-[520px] w-full resize-none bg-transparent p-4 font-mono text-[13px] leading-[1.75] text-[#edf0f3] outline-none selection:bg-[#60a5fa]/25 focus:ring-1 focus:ring-inset focus:ring-[#60a5fa]/30 sm:p-5" />
         </div>
       </section>
 
       <section className="flex min-w-0 flex-col bg-white">
-        <PanelHeader title="LIVE PREVIEW" meta={<span className="inline-flex items-center gap-1 text-xs text-teal-400"><Eye className="h-3 w-3" />Sandboxed</span>}>
+        <PanelHeader title="LIVE PREVIEW" meta={<span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-xs text-emerald-400"><Eye className="h-3 w-3" />Sandboxed</span>}>
           <div className="flex items-center gap-1">
-            <button onClick={toggleLive} aria-pressed={live} title={live ? "Pause live updates" : "Enable live updates"} className={`inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs transition-colors ${live ? "bg-teal-500/10 text-teal-400" : "text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300"}`}>{live ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}{live ? "Live" : "Manual"}</button>
-            <button onClick={refresh} title="Refresh preview" className="inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs text-neutral-500 transition-colors hover:bg-neutral-800 hover:text-neutral-300"><RefreshCw className="h-3.5 w-3.5" />Refresh</button>
+            <button onClick={toggleLive} aria-pressed={live} title={live ? "Pause live updates" : "Enable live updates"} className={`inline-flex items-center gap-1.5 rounded-[7px] px-2 py-1 text-xs transition-colors ${live ? "border border-[#294c73] bg-[#60a5fa]/15 text-[#60a5fa]" : "text-[#575f6b] hover:bg-[#171b21] hover:text-[#edf0f3]"}`}>{live ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}{live ? "Live" : "Manual"}</button>
+            <button onClick={refresh} title="Refresh preview" className="inline-flex items-center gap-1.5 rounded-[7px] px-2 py-1 text-xs text-[#575f6b] transition-colors hover:bg-[#171b21] hover:text-[#edf0f3]"><RefreshCw className="h-3.5 w-3.5" />Refresh</button>
           </div>
         </PanelHeader>
         <iframe ref={iframeRef} key={refreshKey} srcDoc={previewDocument} title="HTML live preview" sandbox="allow-scripts" className="min-h-[380px] w-full flex-1 border-0 bg-white" />
 
-        <div className="flex h-40 min-h-40 flex-col border-t border-neutral-800 bg-neutral-950 text-left">
-          <div className="flex items-center justify-between border-b border-neutral-800 px-3 py-1.5">
+        <div className="flex h-40 min-h-40 flex-col border-t border-[#1a1e24] bg-[#0d0f13] text-left">
+          <div className="flex items-center justify-between border-b border-[#1a1e24] px-3 py-1.5">
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-500"><Terminal className="h-3.5 w-3.5" />Console <span className="text-neutral-700">{consoleEntries.length}</span></span>
             <button onClick={() => setConsoleEntries([])} disabled={!consoleEntries.length} title="Clear console" className="rounded p-1 text-neutral-600 hover:bg-neutral-800 hover:text-neutral-300 disabled:opacity-30"><X className="h-3.5 w-3.5" /></button>
           </div>

@@ -81,14 +81,14 @@ function tokenClassName(type: CodeTokenType): string {
 export default function CodeOutput({ value }: { value: string }) {
   if (!value) {
     return (
-      <div className="editor-surface flex-1 min-h-[360px] bg-neutral-950 p-4 text-[13px] leading-relaxed font-mono text-neutral-700">
+      <div className="editor-surface min-h-[480px] flex-1 p-4 font-mono text-[13px] leading-[1.75] text-neutral-700 sm:p-5">
         Result will appear here...
       </div>
     );
   }
 
   return (
-    <pre className="editor-surface editor-scrollbar flex-1 min-h-[360px] max-h-[520px] overflow-auto whitespace-pre bg-neutral-950 text-[13px] leading-relaxed font-mono p-4">
+    <pre className="editor-surface editor-scrollbar min-h-[480px] max-h-[620px] flex-1 overflow-auto whitespace-pre p-4 font-mono text-[13px] leading-[1.75] sm:p-5">
       <code>
         {tokenizeCode(value).map((token, index) => (
           <span key={`${index}-${token.type}`} className={tokenClassName(token.type)}>

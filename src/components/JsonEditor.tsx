@@ -17,7 +17,7 @@ export default function JsonEditor({ value, onChange }: JsonEditorProps) {
   };
 
   return (
-    <div className="editor-surface relative flex-1 min-h-[360px] bg-neutral-950">
+    <div className="editor-surface relative min-h-[480px] flex-1">
       {!value && (
         <div className="pointer-events-none absolute inset-0 p-4 text-[13px] leading-relaxed font-mono text-neutral-700">
           Paste your JSON here...
@@ -27,7 +27,7 @@ export default function JsonEditor({ value, onChange }: JsonEditorProps) {
       <pre
         ref={previewRef}
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words p-4 text-[13px] leading-relaxed font-mono"
+        className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words p-4 font-mono text-[13px] leading-[1.75] sm:p-5"
       >
         <code>
           {tokenizeJson(value).map((token, index) => (
@@ -44,7 +44,7 @@ export default function JsonEditor({ value, onChange }: JsonEditorProps) {
         onScroll={handleScroll}
         spellCheck={false}
         aria-label="JSON input"
-        className="editor-scrollbar relative z-10 h-full min-h-[360px] w-full resize-none overflow-auto bg-transparent p-4 font-mono text-[13px] leading-relaxed text-transparent caret-teal-300 outline-none selection:bg-teal-500/30 focus:ring-1 focus:ring-inset focus:ring-teal-500/30"
+        className="editor-scrollbar relative z-10 h-full min-h-[480px] w-full resize-none overflow-auto bg-transparent p-4 font-mono text-[13px] leading-[1.75] text-transparent caret-[#60a5fa] outline-none selection:bg-[#60a5fa]/25 focus:ring-1 focus:ring-inset focus:ring-[#60a5fa]/30 sm:p-5"
       />
     </div>
   );
