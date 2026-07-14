@@ -38,6 +38,7 @@ A private, browser-based developer workspace built with React, strict TypeScript
 - **Stringify** converts the editor contents into an escaped JSON string literal.
 - **Copy output** writes generated output to the clipboard.
 - **Swap output** moves JSON output back into the input editor.
+- The JSON input uses an integrated code editor so syntax highlighting, selection, and copied text remain aligned for long or wrapped documents.
 - **Clear** resets the current workspace.
 
 ### Convert JSON to code
